@@ -1,0 +1,235 @@
+{
+  "User & Identity": {
+    "getent": {
+      "description": "Get entries from administrative databases (e.g., passwd, group, hosts).",
+      "example": "getent passwd",
+      "sudo_optional": true,
+      "fields": [
+        {
+          "label": "Database",
+          "flag": "",
+          "type": "dropdown",
+          "options": [
+            "",
+            "passwd",
+            "group",
+            "hosts",
+            "services",
+            "sudoers"
+          ],
+          "tooltip": "The database to query (e.g., 'sudoers' requires sudo)."
+        },
+        {
+          "label": "Key",
+          "flag": "",
+          "tooltip": "Specific entry to look for (e.g., root).\n\nHTB Tip:\n`getent passwd` and `getent group` are better than `cat /etc/passwd` \n because they will also show domain users (LDAP/AD)."
+        }
+      ]
+    },
+    "groupadd": {
+      "description": "Create a new group.",
+      "example": "sudo groupadd developers",
+      "requires_sudo": true,
+      "fields": [
+        {
+          "label": "Group ID (GID)",
+          "flag": "-g",
+          "type": "number_input",
+          "tooltip": "Numeric group ID (e.g., 1001)."
+        },
+        {
+          "label": "Group name",
+          "flag": "",
+          "tooltip": "Name of the new group (e.g., developers)."
+        }
+      ]
+    },
+    "groups": {
+      "description": "Print the groups a user is in.",
+      "example": "groups myuser",
+      "fields": [
+        {
+          "label": "Username",
+          "flag": "",
+          "tooltip": "Leave blank for current user (e.g., myuser)."
+        }
+      ]
+    },
+    "id": {
+      "description": "Print real and effective user and group IDs.",
+      "example": "id www-data",
+      "fields": [
+        {
+          "label": "Groups only (-G)",
+          "flag": "-G",
+          "type": "checkbox"
+        },
+        {
+          "label": "Username",
+          "flag": "",
+          "tooltip": "Leave blank to get information for the current user (e.g., www-data)."
+        }
+      ]
+    },
+    "last": {
+      "description": "Show listing of last logged in users.",
+      "example": "last -n 10",
+      "fields": [
+        {
+          "label": "Number of lines",
+          "flag": "-n",
+          "type": "number_input",
+          "tooltip": "Show only N lines (e.g., 10)."
+        },
+        {
+          "label": "Username",
+          "flag": "",
+          "tooltip": "Show logins for specific user. Leave blank for all."
+        }
+      ]
+    },
+    "passwd": {
+      "description": "Change user password.",
+      "example": "sudo passwd someuser",
+      "sudo_optional": true,
+      "fields": [
+        {
+          "label": "Username",
+          "flag": "",
+          "tooltip": "Leave blank to change your own password. Requires sudo for other users."
+        }
+      ]
+    },
+    "useradd": {
+      "description": "Create a new user account.",
+      "example": "sudo useradd -m -s /bin/bash newuser",
+      "requires_sudo": true,
+      "fields": [
+        {
+          "label": "Home directory",
+          "flag": "-d",
+          "type": "dir_picker",
+          "tooltip": "e.g., /home/username"
+        },
+        {
+          "label": "Shell",
+          "flag": "-s",
+          "type": "dropdown",
+          "options": [
+            "",
+            "/bin/bash",
+            "/bin/sh",
+            "/usr/bin/zsh",
+            "/sbin/nologin"
+          ],
+          "tooltip": "The user's login shell."
+        },
+        {
+          "label": "User ID (UID)",
+          "flag": "-u",
+          "type": "number_input",
+          "tooltip": "Numeric user ID (e.g., 1002)."
+        },
+        {
+          "label": "Create home dir (-m)",
+          "flag": "-m",
+          "type": "checkbox"
+        },
+        {
+          "label": "Username",
+          "flag": "",
+          "tooltip": "Name of the new user to create."
+        }
+      ]
+    },
+    "userdel": {
+      "description": "Delete a user account.",
+      "example": "sudo userdel -r olduser",
+      "requires_sudo": true,
+      "fields": [
+        {
+          "label": "Remove home directory (-r)",
+          "flag": "-r",
+          "type": "checkbox"
+        },
+        {
+          "label": "Username",
+          "flag": "",
+          "tooltip": "Name of the user to delete."
+        }
+      ]
+    },
+    "usermod": {
+      "description": "Modify a user account.",
+      "example": "sudo usermod -aG sudo,docker myuser",
+      "requires_sudo": true,
+      "fields": [
+        {
+          "label": "New login name",
+          "flag": "-l",
+          "tooltip": "Change username."
+        },
+        {
+          "label": "Add to groups",
+          "flag": "-aG",
+          "tooltip": "e.g., sudo,docker (comma-separated)"
+        },
+        {
+          "label": "Lock account (-L)",
+          "flag": "-L",
+          "type": "checkbox",
+          "tooltip": "Lock the user account. Conflicts with Unlock.",
+          "disables": [
+            "-U"
+          ]
+        },
+        {
+          "label": "Unlock account (-U)",
+          "flag": "-U",
+          "type": "checkbox",
+          "tooltip": "Unlock the user account. Conflicts with Lock.",
+          "disables": [
+            "-L"
+          ]
+        },
+        {
+          "label": "Username",
+          "flag": "",
+          "tooltip": "The user to modify."
+        }
+      ]
+    },
+    "w": {
+      "description": "Show who is logged on and what they are doing.",
+      "example": "w",
+      "fields": [
+        {
+          "label": "Short format (-s)",
+          "flag": "-s",
+          "type": "checkbox"
+        }
+      ]
+    },
+    "who": {
+      "description": "Show who is logged on.",
+      "example": "who -b",
+      "fields": [
+        {
+          "label": "Show all (-a)",
+          "flag": "-a",
+          "type": "checkbox"
+        },
+        {
+          "label": "Show boot time (-b)",
+          "flag": "-b",
+          "type": "checkbox"
+        }
+      ]
+    },
+    "whoami": {
+      "description": "Print the effective user name of the current user.",
+      "example": "whoami",
+      "fields": []
+    }
+  }
+}

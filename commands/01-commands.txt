@@ -1,0 +1,140 @@
+================================================
+>>> FILE STRUCTURE <<<
+commands/
+├── archiving.json
+├── disk_and_filesystem.json
+├── file_and_directory_management.json
+├── file_content.json
+├── networking.json
+├── package_management.json
+├── permission.json
+├── process_management.json
+├── search_and_filter.json
+├── system_information.json
+├── text_editors.json
+└── user_and_identity.json
+================================================
+
+Archiving:
+    gzip
+    tar
+    unzip
+    zip
+
+Disk and Filesystem:
+    fdisk
+    fsck
+    mkfs
+    mount
+    unmount
+
+File and Directory Managment:
+    cd 
+    cp 
+    ln 
+    ls 
+    mkdir
+    mv
+    pwd
+    rm
+    touch
+    tree
+
+File Content:
+    cat 
+    diff
+    head 
+    less 
+    tail
+    wc 
+
+Networking:
+    curl 
+    dig 
+    ifconfig 
+    ip 
+    netstat
+    nmap
+    ping
+    rsync
+    scp 
+    ss 
+    ssh
+    traceroute
+    wget
+    whois
+
+Package Managment:
+    apt install
+    apt remove
+    apt search
+    apt update
+    apt upgrade
+    dnf install
+    dpkg -i 
+    rpm -i
+    snap install
+    yum install
+    yum update
+
+Permission:
+    chgrp
+    chmod
+    chown
+    sudo
+    unmask
+
+Process Management:
+    bg
+    fg
+    htop
+    jobs
+    kill
+    killall
+    nice
+    nohup
+    pkill
+    ps 
+    top 
+
+Search and Filter
+    awk
+    find 
+    grep 
+    history
+    locate
+    sed 
+    whereis
+    which
+
+System Information:
+    date
+    df 
+    dmesg
+    du
+    free 
+    hostname
+    lsblk
+    lscpu
+    lspci
+    lsusb
+    uname
+    uptime
+
+Text Editors:
+    nano
+    vi
+    vim
+
+User and Identity:
+    groupadd
+    groups
+    id 
+    last 
+    passwd
+    useradd
+    userdel
+    usermod
+    w 
+    who
+    whoami

@@ -1,0 +1,179 @@
+{
+  "Package Management": {
+    "apt install": {
+      "description": "Install packages (Debian/Ubuntu).",
+      "example": "sudo apt install -y htop",
+      "requires_sudo": true,
+      "fields": [
+        {
+          "label": "Non-interactive (-y)",
+          "flag": "-y",
+          "type": "checkbox",
+          "tooltip": "Assume 'yes' to all prompts."
+        },
+        {
+          "label": "Package name(s)",
+          "flag": "",
+          "tooltip": "Space-separated list of packages (e.g., htop nmap)."
+        }
+      ]
+    },
+    "apt remove": {
+      "description": "Remove installed packages (Debian/Ubuntu).",
+      "example": "sudo apt remove --purge old-package",
+      "requires_sudo": true,
+      "fields": [
+        {
+          "label": "Non-interactive (-y)",
+          "flag": "-y",
+          "type": "checkbox",
+          "tooltip": "Assume 'yes' to all prompts."
+        },
+        {
+          "label": "Purge config files (--purge)",
+          "flag": "--purge",
+          "type": "checkbox",
+          "tooltip": "Remove system-wide configuration files too."
+        },
+        {
+          "label": "Package name(s)",
+          "flag": "",
+          "tooltip": "Space-separated list of packages to remove."
+        }
+      ]
+    },
+    "apt search": {
+      "description": "Search for packages (Debian/Ubuntu).",
+      "example": "apt search filezilla",
+      "fields": [
+        {
+          "label": "Search term",
+          "flag": "",
+          "tooltip": "Package name or description keyword (e.g., filezilla)."
+        }
+      ]
+    },
+    "apt update": {
+      "description": "Update package index (Debian/Ubuntu). Run before upgrading packages.",
+      "example": "sudo apt update",
+      "requires_sudo": true,
+      "fields": []
+    },
+    "apt upgrade": {
+      "description": "Upgrade all installed packages to their latest versions (Debian/Ubuntu).",
+      "example": "sudo apt upgrade -y",
+      "requires_sudo": true,
+      "fields": [
+        {
+          "label": "Non-interactive (-y)",
+          "flag": "-y",
+          "type": "checkbox",
+          "tooltip": "Assume 'yes' to prompts."
+        }
+      ]
+    },
+    "dnf install": {
+      "description": "Install packages (Modern Fedora/RHEL 8+).",
+      "example": "sudo dnf install -y htop",
+      "requires_sudo": true,
+      "fields": [
+        {
+          "label": "Non-interactive (-y)",
+          "flag": "-y",
+          "type": "checkbox",
+          "tooltip": "Assume 'yes' to all prompts."
+        },
+        {
+          "label": "Package name(s)",
+          "flag": "",
+          "tooltip": "Space-separated list of packages (e.g., htop)."
+        }
+      ]
+    },
+    "dpkg -i": {
+      "description": "Install a .deb package file directly (Debian/Ubuntu).",
+      "example": "sudo dpkg -i my-package.deb",
+      "requires_sudo": true,
+      "fields": [
+        {
+          "label": ".deb file path",
+          "flag": "",
+          "type": "file_picker",
+          "tooltip": "Path to the .deb file to install."
+        }
+      ]
+    },
+    "rpm -i": {
+      "description": "Install an .rpm package file directly (RHEL/CentOS/Fedora).",
+      "example": "sudo rpm -ivh my-package.rpm",
+      "requires_sudo": true,
+      "fields": [
+        {
+          "label": "Verbose (-v)",
+          "flag": "-v",
+          "type": "checkbox"
+        },
+        {
+          "label": "Show progress (-h)",
+          "flag": "-h",
+          "type": "checkbox"
+        },
+        {
+          "label": ".rpm file path",
+          "flag": "",
+          "type": "file_picker",
+          "tooltip": "Path to the .rpm file to install."
+        }
+      ]
+    },
+    "snap install": {
+      "description": "Install snap packages (cross-distribution).",
+      "example": "sudo snap install --classic code",
+      "requires_sudo": true,
+      "fields": [
+        {
+          "label": "Classic confinement (--classic)",
+          "flag": "--classic",
+          "type": "checkbox",
+          "tooltip": "For snaps that need access outside the sandbox (e.g., VSCode)."
+        },
+        {
+          "label": "Package name",
+          "flag": "",
+          "tooltip": "Name of the snap to install (e.g., code)."
+        }
+      ]
+    },
+    "yum install": {
+      "description": "Install packages (RHEL/CentOS/Fedora).",
+      "example": "sudo yum install -y htop",
+      "requires_sudo": true,
+      "fields": [
+        {
+          "label": "Non-interactive (-y)",
+          "flag": "-y",
+          "type": "checkbox",
+          "tooltip": "Assume 'yes' to all prompts."
+        },
+        {
+          "label": "Package name(s)",
+          "flag": "",
+          "tooltip": "Space-separated list of packages (e.g., htop)."
+        }
+      ]
+    },
+    "yum update": {
+      "description": "Update all packages (RHEL/CentOS/Fedora).",
+      "example": "sudo yum update -y",
+      "requires_sudo": true,
+      "fields": [
+        {
+          "label": "Non-interactive (-y)",
+          "flag": "-y",
+          "type": "checkbox",
+          "tooltip": "Assume 'yes' to all prompts."
+        }
+      ]
+    }
+  }
+}

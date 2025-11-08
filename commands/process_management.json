@@ -1,0 +1,250 @@
+{
+  "Process Management": {
+    "bg": {
+      "description": "Resume suspended jobs in the background.",
+      "example": "bg %1",
+      "fields": [
+        {
+          "label": "Job number",
+          "flag": "",
+          "tooltip": "Job number to resume (e.g., %1). Leave blank for most recent.",
+          "prefix_flag": true
+        }
+      ]
+    },
+    "fg": {
+      "description": "Bring a background job to the foreground.",
+      "example": "fg %1",
+      "fields": [
+        {
+          "label": "Job number",
+          "flag": "",
+          "tooltip": "Job number to bring forward (e.g., %1). Leave blank for most recent.",
+          "prefix_flag": true
+        }
+      ]
+    },
+    "htop": {
+      "description": "Interactive process viewer. More user-friendly than top (requires installation).",
+      "example": "htop",
+      "fields": [
+        {
+          "label": "User filter",
+          "flag": "-u",
+          "tooltip": "Show processes for specific user only (e.g., root)."
+        }
+      ]
+    },
+    "jobs": {
+      "description": "List active jobs in the current shell session.",
+      "example": "jobs -l",
+      "fields": [
+        {
+          "label": "List PIDs (-l)",
+          "flag": "-l",
+          "type": "checkbox"
+        }
+      ]
+    },
+    "kill": {
+      "description": "Send a signal to a process, usually to terminate it.",
+      "example": "kill -9 12345",
+      "fields": [
+        {
+          "label": "Signal",
+          "flag": "-",
+          "type": "dropdown",
+          "options": [
+            "",
+            "9 (SIGKILL - force)",
+            "15 (SIGTERM - graceful)",
+            "1SIGHUP - reload)",
+            "2 (SIGINT)"
+          ],
+          "tooltip": "Signal to send. Default is SIGTERM (15).",
+          "prefix_flag": true
+        },
+        {
+          "label": "Process ID (PID)",
+          "flag": "",
+          "type": "number_input",
+          "tooltip": "The PID of the process to signal."
+        }
+      ]
+    },
+    "killall": {
+      "description": "Kill processes by name instead of PID.",
+      "example": "killall -i firefox",
+      "fields": [
+        {
+          "label": "Signal",
+          "flag": "-",
+          "type": "dropdown",
+          "options": [
+            "",
+            "9 (SIGKILL)",
+            "15 (SIGTERM)",
+            "1 (SIGHUP)"
+          ],
+          "prefix_flag": true
+        },
+        {
+          "label": "Interactive (-i)",
+          "flag": "-i",
+          "type": "checkbox",
+          "tooltip": "Ask for confirmation before killing."
+        },
+        {
+          "label": "Process name",
+          "flag": "",
+          "tooltip": "Name of the process(es) to kill (e.g., firefox)."
+        }
+      ]
+    },
+    "lsof": {
+      "description": "List open files. In Linux, 'everything is a file' (network sockets, devices, etc.).",
+      "example": "sudo lsof -i :80",
+      "sudo_optional": true,
+      "fields": [
+        {
+          "label": "Network Connections",
+          "flag": "-i",
+          "tooltip": "Show open network connections. Can specify port (e.g., :22 or :80) or protocol (e.g., TCP).\nConflicts with 'File or Path'.",
+          "disables": [
+            "FILEPATH"
+          ]
+        },
+        {
+          "label": "Filter by User",
+          "flag": "-u",
+          "tooltip": "Show files opened by a specific user (e.g., root).\nConflicts with 'File or Path'.",
+          "disables": [
+            "FILEPATH"
+          ]
+        },
+        {
+          "label": "Filter by Command",
+          "flag": "-c",
+          "tooltip": "Show files opened by a command (e.g., sshd).\nConflicts with 'File or Path'.",
+          "disables": [
+            "FILEPATH"
+          ]
+        },
+        {
+          "label": "File or Path",
+          "flag": "FILEPATH",
+          "type": "file_picker",
+          "tooltip": "Show processes that have this file or directory open.\nConflicts with Network, User, or Command filters.\n\nPen Testing Tip:\n`sudo lsof -i` is great for finding running services."
+        }
+      ]
+    },
+    "nice": {
+      "description": "Run a program with modified scheduling priority.",
+      "example": "nice -n 10 tar -czf backup.tar.gz /home",
+      "fields": [
+        {
+          "label": "Priority adjustment",
+          "flag": "-n",
+          "tooltip": "Priority from -20 (highest) to 19 (lowest). Default is 10."
+        },
+        {
+          "label": "Command",
+          "flag": "",
+          "tooltip": "Command to run with adjusted priority.",
+          "auto_quote": true
+        }
+      ]
+    },
+    "nohup": {
+      "description": "Run a command immune to hangups, with output to a non-tty.",
+      "example": "nohup ./my_long_script.sh &",
+      "fields": [
+        {
+          "label": "Command",
+          "flag": "",
+          "tooltip": "Command to run (e.g., ./script.sh). Output goes to nohup.out by default.",
+          "auto_quote": true
+        }
+      ]
+    },
+    "pkill": {
+      "description": "Signal processes based on name and other attributes.",
+      "example": "pkill -f 'python my_app.py'",
+      "fields": [
+        {
+          "label": "Signal",
+          "flag": "-",
+          "type": "dropdown",
+          "options": [
+            "",
+            "9 (SIGKILL)",
+            "15 (SIGTERM)",
+            "1 (SIGHUP)"
+          ],
+          "prefix_flag": true
+        },
+        {
+          "label": "Match full command line (-f)",
+          "flag": "-f",
+          "type": "checkbox"
+        },
+        {
+          "label": "Pattern",
+          "flag": "",
+          "tooltip": "Process name pattern to match.",
+          "auto_quote": true
+        }
+      ]
+    },
+    "ps": {
+      "description": "Report a snapshot of the current processes.",
+      "example": "ps aux | grep 'nginx'",
+      "fields": [
+        {
+          "label": "Show by user",
+          "flag": "-u",
+          "tooltip": "e.g., username"
+        },
+        {
+          "label": "Show all processes (aux)",
+          "flag": "aux",
+          "type": "checkbox",
+          "tooltip": "Most common flag. Shows all processes from all users."
+        },
+        {
+          "label": "Show process tree (--forest)",
+          "flag": "--forest",
+          "type": "checkbox"
+        },
+        {
+          "label": "Full format (-f)",
+          "flag": "-f",
+          "type": "checkbox"
+        }
+      ]
+    },
+    "top": {
+      "description": "Display Linux processes in real-time. Provides a dynamic view of the system.",
+      "example": "top -u root",
+      "fields": [
+        {
+          "label": "User filter",
+          "flag": "-u",
+          "tooltip": "Show processes for specific user only (e.g., root)."
+        },
+        {
+          "label": "Batch mode (-b)",
+          "flag": "-b",
+          "type": "checkbox",
+          "tooltip": "Output for redirecting to a file."
+        },
+        {
+          "label": "Number of iterations",
+          "flag": "-n",
+          "type": "number_input",
+          "tooltip": "Update this many times then exit (e.g., 1)."
+        }
+      ]
+    }
+  }
+}

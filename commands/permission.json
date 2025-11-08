@@ -1,0 +1,133 @@
+{
+  "Permissions": {
+    "chgrp": {
+      "description": "Change the group ownership of files or directories.",
+      "example": "chgrp developers my_script.sh",
+      "sudo_optional": true,
+      "fields": [
+        {
+          "label": "Recursive (-R)",
+          "flag": "-R",
+          "type": "checkbox"
+        },
+        {
+          "label": "Group name",
+          "flag": "",
+          "tooltip": "The group to assign (e.g., developers)."
+        },
+        {
+          "label": "File or Directory Path",
+          "flag": "",
+          "type": "file_picker",
+          "tooltip": "The item to modify (e.g., my_script.sh)."
+        }
+      ]
+    },
+    "chmod": {
+      "description": "Change the permissions (mode) of a file or directory using a visual grid.",
+      "example": "chmod 755 script.sh",
+      "sudo_optional": true,
+      "fields": [
+        {
+          "label": "Permissions",
+          "type": "permission_grid"
+        },
+        {
+          "label": "Recursive (-R)",
+          "flag": "-R",
+          "type": "checkbox"
+        },
+        {
+          "label": "Verbose (-v)",
+          "flag": "-v",
+          "type": "checkbox"
+        },
+        {
+          "label": "File or Directory Path",
+          "flag": "",
+          "type": "file_picker",
+          "tooltip": "The item to modify (e.g., script.sh)."
+        }
+      ]
+    },
+    "chown": {
+      "description": "Change the owner and group of a file or directory.",
+      "example": "sudo chown -R www-data:www-data /var/www/html",
+      "requires_sudo": true,
+      "fields": [
+        {
+          "label": "Recursive (-R)",
+          "flag": "-R",
+          "type": "checkbox"
+        },
+        {
+          "label": "Verbose (-v)",
+          "flag": "-v",
+          "type": "checkbox"
+        },
+        {
+          "label": "Owner:Group",
+          "flag": "",
+          "tooltip": "e.g., www-data:www-data or just www-data"
+        },
+        {
+          "label": "File or Directory Path",
+          "flag": "",
+          "type": "file_picker",
+          "tooltip": "The item to modify (e.g., /var/www/html)."
+        }
+      ]
+    },
+    "sudo": {
+      "description": "Execute a command as another user, typically the superuser (root).",
+      "example": "sudo -u www-data ls -l /var/www",
+      "fields": [
+        {
+          "label": "Run as user",
+          "flag": "-u",
+          "tooltip": "Run as specified user instead of root (e.g., www-data)."
+        },
+        {
+          "label": "Preserve environment (-E)",
+          "flag": "-E",
+          "type": "checkbox"
+        },
+        {
+          "label": "Command to execute",
+          "flag": "",
+          "tooltip": "The command you want to run with elevated privileges.",
+          "auto_quote": true
+        }
+      ]
+    },
+    "sudo -l": {
+      "description": "List the commands the current user is allowed to run as root (or other users).",
+      "example": "sudo -l -U www-data",
+      "fields": [
+        {
+          "label": "List for User",
+          "flag": "-U",
+          "tooltip": "List permissions for a different user (e.g., www-data)."
+        },
+        {
+          "label": "List permissions",
+          "flag": "-l",
+          "type": "checkbox",
+          "tooltip": "List allowed/forbidden commands.\n\nHTB Tip:\nThis is a critical privilege escalation check. Look for (ALL) NOPASSWD: /path/to/command."
+        }
+      ]
+    },
+    "umask": {
+      "description": "Set default file creation permissions mask.",
+      "example": "umask 027",
+      "fields": [
+        {
+          "label": "Mask value",
+          "flag": "",
+          "type": "number_input",
+          "tooltip": "Octal mask (e.g., 022, 027, 077). Leave blank to display current umask."
+        }
+      ]
+    }
+  }
+}

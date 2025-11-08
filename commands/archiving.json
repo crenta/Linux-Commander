@@ -1,0 +1,150 @@
+{
+  "Archiving": {
+    "gzip": {
+      "description": "Compress or decompress files using gzip compression.",
+      "example": "gzip bigfile.txt",
+      "fields": [
+        {
+          "label": "File",
+          "flag": "",
+          "type": "file_picker",
+          "tooltip": "File to compress or decompress."
+        },
+        {
+          "label": "Decompress (-d)",
+          "flag": "-d",
+          "type": "checkbox",
+          "tooltip": "Decompress instead of compress."
+        },
+        {
+          "label": "Keep original (-k)",
+          "flag": "-k",
+          "type": "checkbox",
+          "tooltip": "Don't delete the original file."
+        },
+        {
+          "label": "Verbose (-v)",
+          "flag": "-v",
+          "type": "checkbox"
+        }
+      ]
+    },
+    "tar": {
+      "description": "Create, list, or extract files from an archive (.tar file). Often combined with compression like gzip.",
+      "example": "tar -czvf archive.tar.gz /path/to/directory",
+      "fields": [
+        {
+          "label": "Action",
+          "flag": "",
+          "type": "dropdown",
+          "options": [
+            "",
+            "-czvf (create gzip)",
+            "-cjf (create bzip2)",
+            "-xzvf (extract gzip)",
+            "-xjf (extract bzip2)",
+            "-tzf (list gzip)",
+            "-tf (list)"
+          ],
+          "tooltip": "Common operations: create, extract, or list archive contents."
+        },
+        {
+          "label": "Archive file",
+          "flag": "",
+          "type": "file_picker",
+          "tooltip": "The name of the archive file (e.g., backup.tar.gz)."
+        },
+        {
+          "label": "Files / Directories",
+          "flag": "",
+          "type": "text",
+          "tooltip": "The files/directories to add or extract. Leave blank when listing."
+        },
+        {
+          "label": "Verbose output (-v)",
+          "flag": "-v",
+          "type": "checkbox",
+          "tooltip": "Show files being processed."
+        },
+        {
+          "label": "Exclude pattern",
+          "flag": "--exclude",
+          "tooltip": "Pattern to exclude, e.g., *.log or node_modules",
+          "auto_quote": true
+        }
+      ]
+    },
+    "unzip": {
+      "description": "Extract files from a ZIP archive.",
+      "example": "unzip documents.zip -d /home/user/docs",
+      "fields": [
+        {
+          "label": "ZIP file",
+          "flag": "",
+          "type": "file_picker",
+          "tooltip": "The .zip file to extract (e.g., archive.zip)."
+        },
+        {
+          "label": "Destination directory",
+          "flag": "-d",
+          "type": "dir_picker",
+          "tooltip": "Where to extract files (e.g., /home/user/docs). Conflicts with List.",
+          "disables": [
+            "-l"
+          ]
+        },
+        {
+          "label": "List contents only (-l)",
+          "flag": "-l",
+          "type": "checkbox",
+          "tooltip": "List contents instead of extracting. Conflicts with Destination.",
+          "disables": [
+            "-d"
+          ]
+        }
+      ]
+    },
+    "zip": {
+      "description": "Package and compress (archive) files into a ZIP archive.",
+      "example": "zip -r backup.zip /home/user/documents",
+      "fields": [
+        {
+          "label": "Archive name",
+          "flag": "",
+          "type": "file_save_as",
+          "tooltip": "Output .zip filename (e.g., backup.zip)."
+        },
+        {
+          "label": "Files/Directories",
+          "flag": "",
+          "type": "text",
+          "tooltip": "Files or folders to compress."
+        },
+        {
+          "label": "Recursive (-r)",
+          "flag": "-r",
+          "type": "checkbox",
+          "tooltip": "Include subdirectories."
+        },
+        {
+          "label": "Quiet mode (-q)",
+          "flag": "-q",
+          "type": "checkbox"
+        },
+        {
+          "label": "Compression level",
+          "flag": "-",
+          "type": "dropdown",
+          "options": [
+            "",
+            "0 (store only)",
+            "6 (balanced)",
+            "9 (maximum)"
+          ],
+          "tooltip": "Higher = better compression but slower.",
+          "prefix_flag": true
+        }
+      ]
+    }
+  }
+}
