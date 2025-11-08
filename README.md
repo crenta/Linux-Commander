@@ -1,4 +1,4 @@
-# L-Commander (`./lcom`)
+# L-Commander
 
 L-Commander is a desktop GUI application built with Python and Tkinter designed to help users build, understand, and execute complex Linux commands. It provides a searchable, form-based interface for constructing commands and uses the Mistral AI API to analyze, explain, and validate them before execution.
 
