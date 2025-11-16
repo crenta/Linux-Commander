@@ -4,7 +4,7 @@ L-Commander is a desktop GUI application built with Python and Tkinter designed 
 
 ## 📸 Screenshot
 
-![L-Commander Screenshot](L_commSS.png)
+![L-Commander Screenshot](ScreenShot.png)
 
 ## ✨ Key Features
 
