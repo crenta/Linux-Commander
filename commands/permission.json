@@ -13,13 +13,16 @@
         {
           "label": "Group name",
           "flag": "",
-          "tooltip": "The group to assign (e.g., developers)."
+          "type": "text",
+          "tooltip": "The group to assign (e.g., developers).",
+          "max_length": 32
         },
         {
           "label": "File or Directory Path",
           "flag": "",
           "type": "file_picker",
-          "tooltip": "The item to modify (e.g., my_script.sh)."
+          "tooltip": "The item to modify (e.g., my_script.sh).",
+          "max_length": 4096
         }
       ]
     },
@@ -46,7 +49,8 @@
           "label": "File or Directory Path",
           "flag": "",
           "type": "file_picker",
-          "tooltip": "The item to modify (e.g., script.sh)."
+          "tooltip": "The item to modify (e.g., script.sh).",
+          "max_length": 4096
         }
       ]
     },
@@ -68,13 +72,16 @@
         {
           "label": "Owner:Group",
           "flag": "",
-          "tooltip": "e.g., www-data:www-data or just www-data"
+          "type": "text",
+          "tooltip": "e.g., www-data:www-data or just www-data",
+          "max_length": 255
         },
         {
           "label": "File or Directory Path",
           "flag": "",
           "type": "file_picker",
-          "tooltip": "The item to modify (e.g., /var/www/html)."
+          "tooltip": "The item to modify (e.g., /var/www/html).",
+          "max_length": 4096
         }
       ]
     },
@@ -85,7 +92,9 @@
         {
           "label": "Run as user",
           "flag": "-u",
-          "tooltip": "Run as specified user instead of root (e.g., www-data)."
+          "type": "text",
+          "tooltip": "Run as specified user instead of root (e.g., www-data).",
+          "max_length": 32
         },
         {
           "label": "Preserve environment (-E)",
@@ -95,8 +104,10 @@
         {
           "label": "Command to execute",
           "flag": "",
+          "type": "text",
           "tooltip": "The command you want to run with elevated privileges.",
-          "auto_quote": true
+          "auto_quote": true,
+          "max_length": 1000
         }
       ]
     },
@@ -107,7 +118,9 @@
         {
           "label": "List for User",
           "flag": "-U",
-          "tooltip": "List permissions for a different user (e.g., www-data)."
+          "type": "text",
+          "tooltip": "List permissions for a different user (e.g., www-data).",
+          "max_length": 32
         },
         {
           "label": "List permissions",
@@ -125,7 +138,9 @@
           "label": "Mask value",
           "flag": "",
           "type": "number_input",
-          "tooltip": "Octal mask (e.g., 022, 027, 077). Leave blank to display current umask."
+          "tooltip": "Octal mask (e.g., 022, 027, 077). Leave blank to display current umask.",
+          "min": 0,
+          "max": 777
         }
       ]
     }
