@@ -14,7 +14,8 @@
           "label": "File",
           "flag": "",
           "type": "file_picker",
-          "tooltip": "File to encode/decode. Leave blank for text input.\n\nHTB Tip:\nUsed to obscure data or shells. e.g., echo 'bash -i...' | base64"
+          "tooltip": "File to encode/decode. Leave blank for text input.\n\nHTB Tip:\nUsed to obscure data or shells. e.g., echo 'bash -i...' | base64",
+          "max_length": 4096
         }
       ]
     },
@@ -38,13 +39,16 @@
           "tooltip": "e.g., 16 (Default). Ignored if 'Reverse' is checked.\nConflicts with 'Reverse'.",
           "disables": [
             "-r"
-          ]
+          ],
+          "min": 1,
+          "max": 256
         },
         {
           "label": "File",
           "flag": "",
           "type": "file_picker",
-          "tooltip": "File to process. Leave blank for text input.\n\nPen Testing Tip:\nUseful for analyzing binary file formats or creating shellcode."
+          "tooltip": "File to process. Leave blank for text input.\n\nPen Testing Tip:\nUseful for analyzing binary file formats or creating shellcode.",
+          "max_length": 4096
         }
       ]
     }
