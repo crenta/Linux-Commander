@@ -7,9 +7,11 @@
         {
           "label": "Format",
           "flag": "+",
+          "type": "text",
           "tooltip": "e.g., %Y-%m-%d for YYYY-MM-DD format.",
           "auto_quote": true,
-          "prefix_flag": true
+          "prefix_flag": true,
+          "max_length": 255
         },
         {
           "label": "UTC time (-u)",
@@ -81,7 +83,9 @@
           "tooltip": "e.g., 1 to show only immediate subdirectories. Conflicts with Summarize.",
           "disables": [
             "-s"
-          ]
+          ],
+          "min": 1,
+          "max": 99999
         },
         {
           "label": "Human-readable sizes (-h)",
@@ -106,7 +110,8 @@
           "label": "Path",
           "flag": "",
           "type": "dir_picker",
-          "tooltip": "The file or directory to check (e.g., /var/log). Leave blank for current directory."
+          "tooltip": "The file or directory to check (e.g., /var/log). Leave blank for current directory.",
+          "max_length": 4096
         }
       ]
     },
@@ -128,7 +133,9 @@
           "label": "Continuous updates",
           "flag": "-s",
           "type": "number_input",
-          "tooltip": "Update every N seconds (e.g., 2)."
+          "tooltip": "Update every N seconds (e.g., 2).",
+          "min": 1,
+          "max": 99999
         }
       ]
     },
@@ -145,7 +152,9 @@
         {
           "label": "New hostname",
           "flag": "",
-          "tooltip": "Leave blank to display current hostname. Requires sudo to set."
+          "type": "text",
+          "tooltip": "Leave blank to display current hostname. Requires sudo to set.",
+          "max_length": 255
         }
       ]
     },
@@ -282,7 +291,8 @@
           "tooltip": "Redirects output to a file, overwriting it (e.g., info.txt).",
           "disables": [
             ">>"
-          ]
+          ],
+          "max_length": 4096
         },
         {
           "label": "Output to file (Append)",
@@ -291,7 +301,8 @@
           "tooltip": "Appends output to the end of a file (e.g., info.log).",
           "disables": [
             ">"
-          ]
+          ],
+          "max_length": 4096
         }
       ]
     },
