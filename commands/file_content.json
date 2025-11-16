@@ -8,7 +8,8 @@
           "label": "File(s)",
           "flag": "",
           "type": "text",
-          "tooltip": "The file(s) to display. e.g., /etc/hosts"
+          "tooltip": "The file(s) to display. e.g., /etc/hosts",
+          "max_length": 4096
         },
         {
           "label": "Number all output lines (-n)",
@@ -37,13 +38,15 @@
           "label": "File 1",
           "flag": "",
           "type": "file_picker",
-          "tooltip": "First file to compare (e.g., original.txt)."
+          "tooltip": "First file to compare (e.g., original.txt).",
+          "max_length": 4096
         },
         {
           "label": "File 2",
           "flag": "",
           "type": "file_picker",
-          "tooltip": "Second file to compare (e.g., modified.txt)."
+          "tooltip": "Second file to compare (e.g., modified.txt).",
+          "max_length": 4096
         },
         {
           "label": "Unified format (-u)",
@@ -71,13 +74,16 @@
           "label": "File",
           "flag": "",
           "type": "file_picker",
-          "tooltip": "The file to read from (e.g., /var/log/syslog)."
+          "tooltip": "The file to read from (e.g., /var/log/syslog).",
+          "max_length": 4096
         },
         {
           "label": "Number of lines",
           "flag": "-n",
           "type": "number_input",
-          "tooltip": "How many lines to show from the top (e.g., 20). Default is 10."
+          "tooltip": "How many lines to show from the top (e.g., 20). Default is 10.",
+          "min": 1,
+          "max": 99999
         }
       ]
     },
@@ -89,7 +95,8 @@
           "label": "File",
           "flag": "",
           "type": "file_picker",
-          "tooltip": "File to view (e.g., /var/log/syslog)."
+          "tooltip": "File to view (e.g., /var/log/syslog).",
+          "max_length": 4096
         },
         {
           "label": "Line numbers (-N)",
@@ -112,13 +119,16 @@
           "label": "File",
           "flag": "",
           "type": "file_picker",
-          "tooltip": "The file to read from (e.g., /var/log/syslog)."
+          "tooltip": "The file to read from (e.g., /var/log/syslog).",
+          "max_length": 4096
         },
         {
           "label": "Number of lines",
           "flag": "-n",
           "type": "number_input",
-          "tooltip": "How many lines to show from the bottom (e.g., 50). Default is 10."
+          "tooltip": "How many lines to show from the bottom (e.g., 50). Default is 10.",
+          "min": 1,
+          "max": 99999
         },
         {
           "label": "Follow (watch for changes)",
@@ -142,7 +152,8 @@
           "label": "File",
           "flag": "",
           "type": "file_picker",
-          "tooltip": "The file to count. Leave blank for standard input."
+          "tooltip": "The file to count. Leave blank for standard input.",
+          "max_length": 4096
         },
         {
           "label": "Lines only (-l)",
