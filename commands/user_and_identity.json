@@ -22,7 +22,9 @@
         {
           "label": "Key",
           "flag": "",
-          "tooltip": "Specific entry to look for (e.g., root).\n\nHTB Tip:\n`getent passwd` and `getent group` are better than `cat /etc/passwd` \n because they will also show domain users (LDAP/AD)."
+          "type": "text",
+          "tooltip": "Specific entry to look for (e.g., root).\n\nHTB Tip:\n`getent passwd` and `getent group` are better than `cat /etc/passwd` \n because they will also show domain users (LDAP/AD).",
+          "max_length": 255
         }
       ]
     },
@@ -35,12 +37,16 @@
           "label": "Group ID (GID)",
           "flag": "-g",
           "type": "number_input",
-          "tooltip": "Numeric group ID (e.g., 1001)."
+          "tooltip": "Numeric group ID (e.g., 1001).",
+          "min": 1,
+          "max": 65535
         },
         {
           "label": "Group name",
           "flag": "",
-          "tooltip": "Name of the new group (e.g., developers)."
+          "type": "text",
+          "tooltip": "Name of the new group (e.g., developers).",
+          "max_length": 32
         }
       ]
     },
@@ -51,7 +57,9 @@
         {
           "label": "Username",
           "flag": "",
-          "tooltip": "Leave blank for current user (e.g., myuser)."
+          "type": "text",
+          "tooltip": "Leave blank for current user (e.g., myuser).",
+          "max_length": 32
         }
       ]
     },
@@ -67,7 +75,9 @@
         {
           "label": "Username",
           "flag": "",
-          "tooltip": "Leave blank to get information for the current user (e.g., www-data)."
+          "type": "text",
+          "tooltip": "Leave blank to get information for the current user (e.g., www-data).",
+          "max_length": 32
         }
       ]
     },
@@ -79,12 +89,16 @@
           "label": "Number of lines",
           "flag": "-n",
           "type": "number_input",
-          "tooltip": "Show only N lines (e.g., 10)."
+          "tooltip": "Show only N lines (e.g., 10).",
+          "min": 1,
+          "max": 99999
         },
         {
           "label": "Username",
           "flag": "",
-          "tooltip": "Show logins for specific user. Leave blank for all."
+          "type": "text",
+          "tooltip": "Show logins for specific user. Leave blank for all.",
+          "max_length": 32
         }
       ]
     },
@@ -96,7 +110,9 @@
         {
           "label": "Username",
           "flag": "",
-          "tooltip": "Leave blank to change your own password. Requires sudo for other users."
+          "type": "text",
+          "tooltip": "Leave blank to change your own password. Requires sudo for other users.",
+          "max_length": 32
         }
       ]
     },
@@ -109,7 +125,8 @@
           "label": "Home directory",
           "flag": "-d",
           "type": "dir_picker",
-          "tooltip": "e.g., /home/username"
+          "tooltip": "e.g., /home/username",
+          "max_length": 4096
         },
         {
           "label": "Shell",
@@ -128,7 +145,9 @@
           "label": "User ID (UID)",
           "flag": "-u",
           "type": "number_input",
-          "tooltip": "Numeric user ID (e.g., 1002)."
+          "tooltip": "Numeric user ID (e.g., 1002).",
+          "min": 1,
+          "max": 65535
         },
         {
           "label": "Create home dir (-m)",
@@ -138,7 +157,9 @@
         {
           "label": "Username",
           "flag": "",
-          "tooltip": "Name of the new user to create."
+          "type": "text",
+          "tooltip": "Name of the new user to create.",
+          "max_length": 32
         }
       ]
     },
@@ -155,7 +176,9 @@
         {
           "label": "Username",
           "flag": "",
-          "tooltip": "Name of the user to delete."
+          "type": "text",
+          "tooltip": "Name of the user to delete.",
+          "max_length": 32
         }
       ]
     },
@@ -167,12 +190,16 @@
         {
           "label": "New login name",
           "flag": "-l",
-          "tooltip": "Change username."
+          "type": "text",
+          "tooltip": "Change username.",
+          "max_length": 32
         },
         {
           "label": "Add to groups",
           "flag": "-aG",
-          "tooltip": "e.g., sudo,docker (comma-separated)"
+          "type": "text",
+          "tooltip": "e.g., sudo,docker (comma-separated)",
+          "max_length": 1000
         },
         {
           "label": "Lock account (-L)",
@@ -195,7 +222,9 @@
         {
           "label": "Username",
           "flag": "",
-          "tooltip": "The user to modify."
+          "type": "text",
+          "tooltip": "The user to modify.",
+          "max_length": 32
         }
       ]
     },
