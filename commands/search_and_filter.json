@@ -7,20 +7,25 @@
         {
           "label": "Field separator",
           "flag": "-F",
+          "type": "text",
           "tooltip": "e.g., ':' or ',' for CSV.",
-          "prefix_flag": true
+          "prefix_flag": true,
+          "max_length": 255
         },
         {
           "label": "Pattern/Action",
           "flag": "",
+          "type": "text",
           "tooltip": "e.g., {print $1}",
-          "auto_quote": true
+          "auto_quote": true,
+          "max_length": 1000
         },
         {
           "label": "File",
           "flag": "",
           "type": "file_picker",
-          "tooltip": "Input file. Leave blank for stdin."
+          "tooltip": "Input file. Leave blank for stdin.",
+          "max_length": 4096
         }
       ]
     },
@@ -32,25 +37,30 @@
           "label": "Starting Path",
           "flag": "",
           "type": "dir_picker",
-          "tooltip": "The directory to start searching from (e.g., /var/www or .)."
+          "tooltip": "The directory to start searching from (e.g., /var/www or .).",
+          "max_length": 4096
         },
         {
           "label": "Name pattern",
           "flag": "-name",
+          "type": "text",
           "tooltip": "Use wildcards, e.g., *.log or config.* Mutually exclusive with -iname.",
           "auto_quote": true,
           "disables": [
             "-iname"
-          ]
+          ],
+          "max_length": 255
         },
         {
           "label": "Case insensitive (-iname)",
           "flag": "-iname",
+          "type": "text",
           "tooltip": "Like -name but case insensitive. Mutually exclusive with -name.",
           "auto_quote": true,
           "disables": [
             "-name"
-          ]
+          ],
+          "max_length": 255
         },
         {
           "label": "Type",
@@ -75,7 +85,7 @@
             "G",
             "T"
           ],
-          "tooltip": "\t\t   [+/-] [number] [unit] \nUnit: c (bytes), k (KB), M (MB), G (GB), T (TB). e.g., +100M"
+          "tooltip": "\t\t   [+/-] [number] [unit] \nUnit: c (bytes), k (KB), M (MB), G (GB), T (TB). e.g., +100M"
         },
         {
           "label": "Size (Range 2)",
@@ -89,7 +99,7 @@
             "G",
             "T"
           ],
-          "tooltip": "\t\t   [+/-] [number] [unit] \nUnit: c (bytes), k (KB), M (MB), G (GB), T (TB). e.g., -1G"
+          "tooltip": "\t\t   [+/-] [number] [unit] \nUnit: c (bytes), k (KB), M (MB), G (GB), T (TB). e.g., -1G"
         },
         {
           "label": "Modified Days (Range 1)",
@@ -120,17 +130,23 @@
           "flag": "-newermt",
           "type": "date_input",
           "auto_quote": true,
-          "tooltip": "Select a date. \n\tLeave dropdown blank to find files modified *after* this date. \n\tSelect '!' to find files modified *before or on* this date."
+          "tooltip": "Select a date. \n\tLeave dropdown blank to find files modified *after* this date. \n\tSelect '!' to find files modified *before or on* this date.",
+          "min_year": 1970,
+          "max_year": "current"
         },
         {
           "label": "Owned by User",
           "flag": "-user",
-          "tooltip": "Find files owned by this user, e.g., root"
+          "type": "text",
+          "tooltip": "Find files owned by this user, e.g., root",
+          "max_length": 32
         },
         {
           "label": "Owned by Group",
           "flag": "-group",
-          "tooltip": "Find files owned by this group, e.g., www-data"
+          "type": "text",
+          "tooltip": "Find files owned by this group, e.g., www-data",
+          "max_length": 32
         },
         {
           "label": "Permissions",
@@ -141,8 +157,10 @@
         {
           "label": "Execute command on results",
           "flag": "-exec",
+          "type": "text",
           "tooltip": "e.g., rm {} \\; (**use with caution!**)",
-          "auto_quote": true
+          "auto_quote": true,
+          "max_length": 1000
         },
         {
           "label": "Suppress Errors (2>/dev/null)",
@@ -160,7 +178,9 @@
           "label": "Context lines",
           "flag": "-C",
           "type": "number_input",
-          "tooltip": "Show N lines before and after match (e.g., 3)."
+          "tooltip": "Show N lines before and after match (e.g., 3).",
+          "min": 1,
+          "max": 99999
         },
         {
           "label": "Ignore case (-i)",
@@ -210,14 +230,17 @@
         {
           "label": "Pattern",
           "flag": "",
+          "type": "text",
           "tooltip": "The text or regular expression to search for.",
-          "auto_quote": true
+          "auto_quote": true,
+          "max_length": 1000
         },
         {
           "label": "File or Path",
           "flag": "",
           "type": "file_picker",
-          "tooltip": "The file or directory to search in. Leave blank for standard input."
+          "tooltip": "The file or directory to search in. Leave blank for standard input.",
+          "max_length": 4096
         }
       ]
     },
@@ -229,7 +252,9 @@
           "label": "Number of commands",
           "flag": "",
           "type": "number_input",
-          "tooltip": "Show last N commands (e.g., 20). Leave blank for all."
+          "tooltip": "Show last N commands (e.g., 20). Leave blank for all.",
+          "min": 1,
+          "max": 99999
         }
       ]
     },
@@ -241,7 +266,9 @@
           "label": "Limit results",
           "flag": "-n",
           "type": "number_input",
-          "tooltip": "Limit output to N entries (e.g., 10)."
+          "tooltip": "Limit output to N entries (e.g., 10).",
+          "min": 1,
+          "max": 99999
         },
         {
           "label": "Ignore case (-i)",
@@ -251,7 +278,9 @@
         {
           "label": "Pattern",
           "flag": "",
-          "tooltip": "Filename pattern to search for (e.g., httpd.conf)."
+          "type": "text",
+          "tooltip": "Filename pattern to search for (e.g., httpd.conf).",
+          "max_length": 255
         }
       ]
     },
@@ -273,14 +302,17 @@
         {
           "label": "Expression",
           "flag": "",
+          "type": "text",
           "tooltip": "e.g., s/old/new/g",
-          "auto_quote": true
+          "auto_quote": true,
+          "max_length": 1000
         },
         {
           "label": "File",
           "flag": "",
           "type": "file_picker",
-          "tooltip": "Input file. Leave blank for stdin."
+          "tooltip": "Input file. Leave blank for stdin.",
+          "max_length": 4096
         }
       ]
     },
@@ -291,7 +323,9 @@
         {
           "label": "Program name",
           "flag": "",
-          "tooltip": "e.g., gcc or bash"
+          "type": "text",
+          "tooltip": "e.g., gcc or bash",
+          "max_length": 255
         }
       ]
     },
@@ -307,7 +341,9 @@
         {
           "label": "Program name",
           "flag": "",
-          "tooltip": "Search for installed tools, e.g.:\n\n  Network:\n    nmap, nc, tcpdump, curl, wget\n\n  Recon/Enum:\n    id, sudo, whoami, getent, groups\n\n  Process/Utils:\n    find, grep, awk, sed, gcc, make\n\n  Exploitation:\n    lsof, ss, netstat, ps, gdb, strace\n\n  Misc:\n    base64, xxd, hexdump, nano, vi"
+          "type": "text",
+          "tooltip": "Search for installed tools, e.g.:\n\n  Network:\n    nmap, nc, tcpdump, curl, wget\n\n  Recon/Enum:\n    id, sudo, whoami, getent, groups\n\n  Process/Utils:\n    find, grep, awk, sed, gcc, make\n\n  Exploitation:\n    lsof, ss, netstat, ps, gdb, strace\n\n  Misc:\n    base64, xxd, hexdump, nano, vi",
+          "max_length": 255
         }
       ]
     }
