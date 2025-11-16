@@ -9,13 +9,15 @@
           "label": "Source",
           "flag": "",
           "type": "file_picker",
-          "tooltip": "The file or directory to copy."
+          "tooltip": "The file or directory to copy.",
+          "max_length": 4096
         },
         {
           "label": "Destination",
           "flag": "",
           "type": "dir_picker",
-          "tooltip": "The location or new filename to copy to."
+          "tooltip": "The location or new filename to copy to.",
+          "max_length": 4096
         },
         {
           "label": "Recursive (copy directories)",
@@ -49,13 +51,15 @@
           "label": "Target",
           "flag": "",
           "type": "file_picker",
-          "tooltip": "The existing file or directory to link to."
+          "tooltip": "The existing file or directory to link to.",
+          "max_length": 4096
         },
         {
           "label": "Link name",
           "flag": "",
           "type": "file_save_as",
-          "tooltip": "The name of the link to create."
+          "tooltip": "The name of the link to create.",
+          "max_length": 4096
         },
         {
           "label": "Symbolic link (-s)",
@@ -79,7 +83,8 @@
           "label": "Path",
           "flag": "",
           "type": "dir_picker",
-          "tooltip": "Directory to list (e.g., /var/log). Leave blank for current directory."
+          "tooltip": "Directory to list (e.g., /var/log). Leave blank for current directory.",
+          "max_length": 4096
         },
         {
           "label": "Long listing format (-l)",
@@ -138,13 +143,16 @@
           "label": "Directory Name(s)",
           "flag": "",
           "type": "text",
-          "tooltip": "Name of the directory to create, e.g., my_folder. \nCan be multiple names separated by spaces."
+          "tooltip": "Name of the directory to create, e.g., my_folder. \nCan be multiple names separated by spaces.",
+          "max_length": 4096
         },
         {
           "label": "Set permissions",
           "flag": "-m",
           "type": "number_input",
-          "tooltip": "Set permissions in octal format.\n\nCommon values:\n  755 (rwxr-xr-x): Owner all, others read/enter\n  700 (rwx------): Owner all, others no access\n  750 (rwxr-x---): Owner & Group can read/enter\n  777 (rwxrwxrwx): Everyone all (use cautiously)"
+          "tooltip": "Set permissions in octal format.\n\nCommon values:\n 755 (rwxr-xr-x): Owner all, others read/enter\n 700 (rwx------): Owner all, others no access\n 750 (rwxr-x---): Owner & Group can read/enter\n 777 (rwxrwxrwx): Everyone all (use cautiously)",
+          "min": 0,
+          "max": 777
         },
         {
           "label": "Create parent directories (-p)",
@@ -163,13 +171,15 @@
           "label": "Source",
           "flag": "",
           "type": "file_picker",
-          "tooltip": "The file or directory to move/rename."
+          "tooltip": "The file or directory to move/rename.",
+          "max_length": 4096
         },
         {
           "label": "Destination",
           "flag": "",
           "type": "dir_picker",
-          "tooltip": "The new location or new name."
+          "tooltip": "The new location or new name.",
+          "max_length": 4096
         },
         {
           "label": "Interactive (-i)",
@@ -199,10 +209,11 @@
           "label": "Directory Path",
           "flag": "",
           "type": "dir_picker",
-          "tooltip": "Enter path:\n  /var/log (absolute)\n  .. (up one dir)\n  . (current dir)\n  ~ (your home)\n  ~user (another user's home)\n\nLeave blank to go home.",
+          "tooltip": "Enter path:\n  /var/log (absolute)\n  .. (up one dir)\n  . (current dir)\n  ~ (your home)\n  ~user (another user's home)\n\nLeave blank to go home.",
           "disables": [
             "-"
-          ]
+          ],
+          "max_length": 4096
         },
         {
           "label": "Go to previous directory (-)",
@@ -229,7 +240,8 @@
           "label": "File or Directory",
           "flag": "",
           "type": "file_picker",
-          "tooltip": "The item to remove. Separate multiple files with spaces."
+          "tooltip": "The item to remove. Separate multiple files with spaces.",
+          "max_length": 4096
         },
         {
           "label": "Recursive (delete directories)",
@@ -264,7 +276,8 @@
           "label": "File(s)",
           "flag": "",
           "type": "text",
-          "tooltip": "File(s) to create or update. Space-separated."
+          "tooltip": "File(s) to create or update. Space-separated.",
+          "max_length": 4096
         }
       ]
     },
@@ -276,13 +289,16 @@
           "label": "Directory Path",
           "flag": "",
           "type": "dir_picker",
-          "tooltip": "Enter path to scan (e.g., /etc or ..). Leave blank to scan current directory."
+          "tooltip": "Enter path to scan (e.g., /etc or ..). Leave blank to scan current directory.",
+          "max_length": 4096
         },
         {
           "label": "Max depth to show (-L)",
           "flag": "-L",
           "type": "number_input",
-          "tooltip": "e.g., 2. Limits how many levels deep the tree will go."
+          "tooltip": "e.g., 2. Limits how many levels deep the tree will go.",
+          "min": 1,
+          "max": 99999
         },
         {
           "label": "Show hidden files (-a)",
@@ -306,7 +322,8 @@
           "auto_quote": true,
           "disables": [
             "-I"
-          ]
+          ],
+          "max_length": 255
         },
         {
           "label": "Ignore by pattern (-I)",
@@ -315,7 +332,8 @@
           "auto_quote": true,
           "disables": [
             "-P"
-          ]
+          ],
+          "max_length": 255
         }
       ]
     }
