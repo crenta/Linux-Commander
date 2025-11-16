@@ -8,7 +8,8 @@
           "label": "File",
           "flag": "",
           "type": "file_picker",
-          "tooltip": "File to compress or decompress."
+          "tooltip": "File to compress or decompress.",
+          "max_length": 4096
         },
         {
           "label": "Decompress (-d)",
@@ -52,13 +53,15 @@
           "label": "Archive file",
           "flag": "",
           "type": "file_picker",
-          "tooltip": "The name of the archive file (e.g., backup.tar.gz)."
+          "tooltip": "The name of the archive file (e.g., backup.tar.gz).",
+          "max_length": 4096
         },
         {
           "label": "Files / Directories",
           "flag": "",
           "type": "text",
-          "tooltip": "The files/directories to add or extract. Leave blank when listing."
+          "tooltip": "The files/directories to add or extract. Leave blank when listing.",
+          "max_length": 1000
         },
         {
           "label": "Verbose output (-v)",
@@ -82,7 +85,8 @@
           "label": "ZIP file",
           "flag": "",
           "type": "file_picker",
-          "tooltip": "The .zip file to extract (e.g., archive.zip)."
+          "tooltip": "The .zip file to extract (e.g., archive.zip).",
+          "max_length": 4096
         },
         {
           "label": "Destination directory",
@@ -91,7 +95,8 @@
           "tooltip": "Where to extract files (e.g., /home/user/docs). Conflicts with List.",
           "disables": [
             "-l"
-          ]
+          ],
+          "max_length": 4096
         },
         {
           "label": "List contents only (-l)",
@@ -112,13 +117,15 @@
           "label": "Archive name",
           "flag": "",
           "type": "file_save_as",
-          "tooltip": "Output .zip filename (e.g., backup.zip)."
+          "tooltip": "Output .zip filename (e.g., backup.zip).",
+          "max_length": 4096
         },
         {
           "label": "Files/Directories",
           "flag": "",
           "type": "text",
-          "tooltip": "Files or folders to compress."
+          "tooltip": "Files or folders to compress.",
+          "max_length": 1000
         },
         {
           "label": "Recursive (-r)",
