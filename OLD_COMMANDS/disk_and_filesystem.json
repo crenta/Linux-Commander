@@ -1,0 +1,148 @@
+{
+  "Disk & Filesystem": {
+    "fdisk": {
+      "description": "Partition table manipulator for disk partitioning.",
+      "example": "sudo fdisk -l /dev/sda",
+      "requires_sudo": true,
+      "fields": [
+        {
+          "label": "Device",
+          "flag": "",
+          "type": "file_picker",
+          "tooltip": "The disk device to manipulate, e.g., /dev/sda"
+        },
+        {
+          "label": "List partitions (-l)",
+          "flag": "-l",
+          "type": "checkbox"
+        }
+      ]
+    },
+    "fsck": {
+      "description": "Check and repair a Linux filesystem.",
+      "example": "sudo fsck -y /dev/sda1",
+      "requires_sudo": true,
+      "fields": [
+        {
+          "label": "Device",
+          "flag": "",
+          "type": "file_picker",
+          "tooltip": "The partition to check, e.g., /dev/sda1"
+        },
+        {
+          "label": "Filesystem type",
+          "flag": "-t",
+          "type": "dropdown",
+          "options": [
+            "",
+            "ext4",
+            "ext3",
+            "xfs",
+            "vfat",
+            "ntfs"
+          ],
+          "tooltip": "e.g., ext4. Usually auto-detected."
+        },
+        {
+          "label": "Automatic repair (-y)",
+          "flag": "-y",
+          "type": "checkbox"
+        }
+      ]
+    },
+    "mkfs": {
+      "description": "Build a Linux filesystem on a device.",
+      "example": "sudo mkfs -t ext4 /dev/sdb1",
+      "requires_sudo": true,
+      "fields": [
+        {
+          "label": "Filesystem type",
+          "flag": "-t",
+          "type": "dropdown",
+          "options": [
+            "ext4",
+            "ext3",
+            "xfs",
+            "vfat",
+            "ntfs"
+          ],
+          "tooltip": "Type of filesystem to create."
+        },
+        {
+          "label": "Device",
+          "flag": "",
+          "type": "file_picker",
+          "tooltip": "The partition to format, e.g., /dev/sdb1"
+        },
+        {
+          "label": "Label",
+          "flag": "-L",
+          "tooltip": "Filesystem label/name (e.g., USB_DRIVE)."
+        }
+      ]
+    },
+    "mount": {
+      "description": "Mount a filesystem.",
+      "example": "sudo mount /dev/sdb1 /mnt/usb",
+      "requires_sudo": true,
+      "fields": [
+        {
+          "label": "Device",
+          "flag": "",
+          "type": "file_picker",
+          "tooltip": "The partition to mount, e.g., /dev/sdb1"
+        },
+        {
+          "label": "Mount point",
+          "flag": "",
+          "type": "dir_picker",
+          "tooltip": "Directory to mount at, e.g., /mnt/usb"
+        },
+        {
+          "label": "Filesystem type",
+          "flag": "-t",
+          "type": "dropdown",
+          "options": [
+            "",
+            "ext4",
+            "ntfs",
+            "vfat",
+            "xfs",
+            "cifs",
+            "iso9660"
+          ],
+          "tooltip": "e.g., ext4, ntfs, vfat. Usually auto-detected."
+        },
+        {
+          "label": "Options",
+          "flag": "-o",
+          "tooltip": "e.g., ro (read-only), noexec"
+        }
+      ]
+    },
+    "umount": {
+      "description": "Unmount a filesystem.",
+      "example": "sudo umount /mnt/usb",
+      "requires_sudo": true,
+      "fields": [
+        {
+          "label": "Mount point or device",
+          "flag": "",
+          "type": "text",
+          "tooltip": "e.g., /mnt/usb or /dev/sdb1"
+        },
+        {
+          "label": "Force (-f)",
+          "flag": "-f",
+          "type": "checkbox"
+        },
+        {
+          "label": "Lazy unmount (-l)",
+          "flag": "-l",
+          "type": "checkbox",
+          "tooltip": "Detach now, cleanup later."
+        }
+      ]
+    }
+  }
+}

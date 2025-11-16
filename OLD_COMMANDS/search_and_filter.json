@@ -1,0 +1,315 @@
+{
+  "Search & Filter": {
+    "awk": {
+      "description": "Pattern scanning and processing language. Powerful for text processing.",
+      "example": "awk -F: '{print $1}' /etc/passwd",
+      "fields": [
+        {
+          "label": "Field separator",
+          "flag": "-F",
+          "tooltip": "e.g., ':' or ',' for CSV.",
+          "prefix_flag": true
+        },
+        {
+          "label": "Pattern/Action",
+          "flag": "",
+          "tooltip": "e.g., {print $1}",
+          "auto_quote": true
+        },
+        {
+          "label": "File",
+          "flag": "",
+          "type": "file_picker",
+          "tooltip": "Input file. Leave blank for stdin."
+        }
+      ]
+    },
+    "find": {
+      "description": "Search for files in a directory hierarchy based on criteria.",
+      "example": "find /var/log -size +100M -size -1G -name '*.log'",
+      "fields": [
+        {
+          "label": "Starting Path",
+          "flag": "",
+          "type": "dir_picker",
+          "tooltip": "The directory to start searching from (e.g., /var/www or .)."
+        },
+        {
+          "label": "Name pattern",
+          "flag": "-name",
+          "tooltip": "Use wildcards, e.g., *.log or config.* Mutually exclusive with -iname.",
+          "auto_quote": true,
+          "disables": [
+            "-iname"
+          ]
+        },
+        {
+          "label": "Case insensitive (-iname)",
+          "flag": "-iname",
+          "tooltip": "Like -name but case insensitive. Mutually exclusive with -name.",
+          "auto_quote": true,
+          "disables": [
+            "-name"
+          ]
+        },
+        {
+          "label": "Type",
+          "flag": "-type",
+          "type": "dropdown",
+          "options": [
+            "",
+            "f (regular file)",
+            "d (directory)",
+            "l (symbolic link)"
+          ]
+        },
+        {
+          "label": "Size (Range 1)",
+          "flag": "-size",
+          "type": "size_input",
+          "options": [
+            "",
+            "c",
+            "k",
+            "M",
+            "G",
+            "T"
+          ],
+          "tooltip": "\t\t   [+/-] [number] [unit] \nUnit: c (bytes), k (KB), M (MB), G (GB), T (TB). e.g., +100M"
+        },
+        {
+          "label": "Size (Range 2)",
+          "flag": "-size",
+          "type": "size_input",
+          "options": [
+            "",
+            "c",
+            "k",
+            "M",
+            "G",
+            "T"
+          ],
+          "tooltip": "\t\t   [+/-] [number] [unit] \nUnit: c (bytes), k (KB), M (MB), G (GB), T (TB). e.g., -1G"
+        },
+        {
+          "label": "Modified Days (Range 1)",
+          "flag": "-mtime",
+          "type": "relative_time_input",
+          "tooltip": "Days ago. +7 (older than 7 days), -30 (newer than 30 days)."
+        },
+        {
+          "label": "Modified Days (Range 2)",
+          "flag": "-mtime",
+          "type": "relative_time_input",
+          "tooltip": "Days ago. e.g., -30 (newer than 30 days)"
+        },
+        {
+          "label": "Modified Minutes (Range 1)",
+          "flag": "-mmin",
+          "type": "relative_time_input",
+          "tooltip": "Minutes ago. +60 (older than 60 min), -15 (newer than 15 min)."
+        },
+        {
+          "label": "Modified Minutes (Range 2)",
+          "flag": "-mmin",
+          "type": "relative_time_input",
+          "tooltip": "Minutes ago. e.g., -15 (newer than 15 min)"
+        },
+        {
+          "label": "Date Modified (Timestamp)",
+          "flag": "-newermt",
+          "type": "date_input",
+          "auto_quote": true,
+          "tooltip": "Select a date. \n\tLeave dropdown blank to find files modified *after* this date. \n\tSelect '!' to find files modified *before or on* this date."
+        },
+        {
+          "label": "Owned by User",
+          "flag": "-user",
+          "tooltip": "Find files owned by this user, e.g., root"
+        },
+        {
+          "label": "Owned by Group",
+          "flag": "-group",
+          "tooltip": "Find files owned by this group, e.g., www-data"
+        },
+        {
+          "label": "Permissions",
+          "flag": "-perm",
+          "type": "permission_input",
+          "tooltip": "Enter Octal (e.g., 755) or Symbolic (e.g., u=s). \nUse dropdown: \n\t(exact) '755' \n\t(at least) '-4000' (SetUID) \n\t(any of) '/222' (any write bit)."
+        },
+        {
+          "label": "Execute command on results",
+          "flag": "-exec",
+          "tooltip": "e.g., rm {} \\; (**use with caution!**)",
+          "auto_quote": true
+        },
+        {
+          "label": "Suppress Errors (2>/dev/null)",
+          "flag": "redirect_stderr",
+          "type": "checkbox",
+          "tooltip": "Redirects error messages so they are not displayed."
+        }
+      ]
+    },
+    "grep": {
+      "description": "Search for PATTERNs in each FILE. A command-line search utility.",
+      "example": "grep -rni 'error' /var/log/",
+      "fields": [
+        {
+          "label": "Context lines",
+          "flag": "-C",
+          "type": "number_input",
+          "tooltip": "Show N lines before and after match (e.g., 3)."
+        },
+        {
+          "label": "Ignore case (-i)",
+          "flag": "-i",
+          "type": "checkbox"
+        },
+        {
+          "label": "Show line numbers (-n)",
+          "flag": "-n",
+          "type": "checkbox"
+        },
+        {
+          "label": "Recursive search (-r)",
+          "flag": "-r",
+          "type": "checkbox"
+        },
+        {
+          "label": "Invert match (-v)",
+          "flag": "-v",
+          "type": "checkbox",
+          "tooltip": "Select non-matching lines."
+        },
+        {
+          "label": "Count matches (-c)",
+          "flag": "-c",
+          "type": "checkbox",
+          "tooltip": "Count matching lines. Conflicts with List filenames.",
+          "disables": [
+            "-l"
+          ]
+        },
+        {
+          "label": "Show only filenames (-l)",
+          "flag": "-l",
+          "type": "checkbox",
+          "tooltip": "Show only filenames with matches. Conflicts with Count.",
+          "disables": [
+            "-c"
+          ]
+        },
+        {
+          "label": "Extended regex (-E)",
+          "flag": "-E",
+          "type": "checkbox",
+          "tooltip": "Use extended regular expressions."
+        },
+        {
+          "label": "Pattern",
+          "flag": "",
+          "tooltip": "The text or regular expression to search for.",
+          "auto_quote": true
+        },
+        {
+          "label": "File or Path",
+          "flag": "",
+          "type": "file_picker",
+          "tooltip": "The file or directory to search in. Leave blank for standard input."
+        }
+      ]
+    },
+    "history": {
+      "description": "Display the history of commands executed in the current shell session.",
+      "example": "history 20",
+      "fields": [
+        {
+          "label": "Number of commands",
+          "flag": "",
+          "type": "number_input",
+          "tooltip": "Show last N commands (e.g., 20). Leave blank for all."
+        }
+      ]
+    },
+    "locate": {
+      "description": "Find files by name quickly using a database. Much faster than find.",
+      "example": "locate -i httpd.conf",
+      "fields": [
+        {
+          "label": "Limit results",
+          "flag": "-n",
+          "type": "number_input",
+          "tooltip": "Limit output to N entries (e.g., 10)."
+        },
+        {
+          "label": "Ignore case (-i)",
+          "flag": "-i",
+          "type": "checkbox"
+        },
+        {
+          "label": "Pattern",
+          "flag": "",
+          "tooltip": "Filename pattern to search for (e.g., httpd.conf)."
+        }
+      ]
+    },
+    "sed": {
+      "description": "Stream editor for filtering and transforming text.",
+      "example": "sed 's/old_text/new_text/g' input.txt > output.txt",
+      "fields": [
+        {
+          "label": "In-place editing (-i)",
+          "flag": "-i",
+          "type": "checkbox",
+          "tooltip": "Modify file directly."
+        },
+        {
+          "label": "Extended regex (-E)",
+          "flag": "-E",
+          "type": "checkbox"
+        },
+        {
+          "label": "Expression",
+          "flag": "",
+          "tooltip": "e.g., s/old/new/g",
+          "auto_quote": true
+        },
+        {
+          "label": "File",
+          "flag": "",
+          "type": "file_picker",
+          "tooltip": "Input file. Leave blank for stdin."
+        }
+      ]
+    },
+    "whereis": {
+      "description": "Locate the binary, source, and manual page files for a command.",
+      "example": "whereis bash",
+      "fields": [
+        {
+          "label": "Program name",
+          "flag": "",
+          "tooltip": "e.g., gcc or bash"
+        }
+      ]
+    },
+    "which": {
+      "description": "Locate a command's executable file in the user's PATH.",
+      "example": "which nc",
+      "fields": [
+        {
+          "label": "Show all matches (-a)",
+          "flag": "-a",
+          "type": "checkbox"
+        },
+        {
+          "label": "Program name",
+          "flag": "",
+          "tooltip": "Search for installed tools, e.g.:\n\n  Network:\n    nmap, nc, tcpdump, curl, wget\n\n  Recon/Enum:\n    id, sudo, whoami, getent, groups\n\n  Process/Utils:\n    find, grep, awk, sed, gcc, make\n\n  Exploitation:\n    lsof, ss, netstat, ps, gdb, strace\n\n  Misc:\n    base64, xxd, hexdump, nano, vi"
+        }
+      ]
+    }
+  }
+}

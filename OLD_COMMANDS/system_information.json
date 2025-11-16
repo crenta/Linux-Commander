@@ -1,0 +1,311 @@
+{
+  "System Information": {
+    "date": {
+      "description": "Display or set the system date and time.",
+      "example": "date +%Y-%m-%d",
+      "fields": [
+        {
+          "label": "Format",
+          "flag": "+",
+          "tooltip": "e.g., %Y-%m-%d for YYYY-MM-DD format.",
+          "auto_quote": true,
+          "prefix_flag": true
+        },
+        {
+          "label": "UTC time (-u)",
+          "flag": "-u",
+          "type": "checkbox"
+        }
+      ]
+    },
+    "df": {
+      "description": "Report file system disk space usage.",
+      "example": "df -h",
+      "fields": [
+        {
+          "label": "Human-readable sizes (-h)",
+          "flag": "-h",
+          "type": "checkbox"
+        },
+        {
+          "label": "File system type (-T)",
+          "flag": "-T",
+          "type": "checkbox"
+        },
+        {
+          "label": "Inodes (-i)",
+          "flag": "-i",
+          "type": "checkbox",
+          "tooltip": "Show inode information instead of block usage."
+        }
+      ]
+    },
+    "dmesg": {
+      "description": "Print or control the kernel ring buffer (system messages).",
+      "example": "dmesg -T | tail",
+      "requires_sudo": true,
+      "fields": [
+        {
+          "label": "Follow new messages (-w)",
+          "flag": "-w",
+          "type": "checkbox",
+          "tooltip": "Wait for new messages (like tail -f). Conflicts with Clear.",
+          "disables": [
+            "-C"
+          ]
+        },
+        {
+          "label": "Human-readable timestamps (-T)",
+          "flag": "-T",
+          "type": "checkbox"
+        },
+        {
+          "label": "Clear buffer (-C)",
+          "flag": "-C",
+          "type": "checkbox",
+          "tooltip": "Clear the buffer after printing. Conflicts with Follow.",
+          "disables": [
+            "-w"
+          ]
+        }
+      ]
+    },
+    "du": {
+      "description": "Estimate file and directory space usage.",
+      "example": "du -sh /var/log/",
+      "fields": [
+        {
+          "label": "Max depth",
+          "flag": "--max-depth",
+          "type": "number_input",
+          "tooltip": "e.g., 1 to show only immediate subdirectories. Conflicts with Summarize.",
+          "disables": [
+            "-s"
+          ]
+        },
+        {
+          "label": "Human-readable sizes (-h)",
+          "flag": "-h",
+          "type": "checkbox"
+        },
+        {
+          "label": "Summarize total size (-s)",
+          "flag": "-s",
+          "type": "checkbox",
+          "tooltip": "Display only a total. Conflicts with Max depth.",
+          "disables": [
+            "--max-depth"
+          ]
+        },
+        {
+          "label": "Show total (-c)",
+          "flag": "-c",
+          "type": "checkbox"
+        },
+        {
+          "label": "Path",
+          "flag": "",
+          "type": "dir_picker",
+          "tooltip": "The file or directory to check (e.g., /var/log). Leave blank for current directory."
+        }
+      ]
+    },
+    "free": {
+      "description": "Display amount of free and used memory in the system.",
+      "example": "free -h",
+      "fields": [
+        {
+          "label": "Human-readable (-h)",
+          "flag": "-h",
+          "type": "checkbox"
+        },
+        {
+          "label": "Show totals (-t)",
+          "flag": "-t",
+          "type": "checkbox"
+        },
+        {
+          "label": "Continuous updates",
+          "flag": "-s",
+          "type": "number_input",
+          "tooltip": "Update every N seconds (e.g., 2)."
+        }
+      ]
+    },
+    "hostname": {
+      "description": "Show or set the system's host name.",
+      "example": "sudo hostname new-server-name",
+      "sudo_optional": true,
+      "fields": [
+        {
+          "label": "Show IP address (-I)",
+          "flag": "-I",
+          "type": "checkbox"
+        },
+        {
+          "label": "New hostname",
+          "flag": "",
+          "tooltip": "Leave blank to display current hostname. Requires sudo to set."
+        }
+      ]
+    },
+    "lsblk": {
+      "description": "List information about block devices (disks and partitions).",
+      "example": "lsblk -f",
+      "fields": [
+        {
+          "label": "Show filesystem type (-f)",
+          "flag": "-f",
+          "type": "checkbox"
+        },
+        {
+          "label": "Include empty devices (-a)",
+          "flag": "-a",
+          "type": "checkbox"
+        }
+      ]
+    },
+    "lscpu": {
+      "description": "Display information about the CPU architecture.",
+      "example": "lscpu",
+      "fields": []
+    },
+    "lspci": {
+      "description": "List all PCI devices.",
+      "example": "lspci -v",
+      "fields": [
+        {
+          "label": "Verbose (-v)",
+          "flag": "-v",
+          "type": "checkbox"
+        }
+      ]
+    },
+    "lsusb": {
+      "description": "List USB devices connected to the system.",
+      "example": "lsusb",
+      "fields": [
+        {
+          "label": "Verbose (-v)",
+          "flag": "-v",
+          "type": "checkbox"
+        }
+      ]
+    },
+    "uname": {
+      "description": "Print certain system information.",
+      "example": "uname -a > system_info.txt",
+      "fields": [
+        {
+          "label": "All information (-a)",
+          "flag": "-a",
+          "type": "checkbox",
+          "disables": [
+            "-s",
+            "-n",
+            "-r",
+            "-v",
+            "-m",
+            "-p",
+            "-i",
+            "-o"
+          ]
+        },
+        {
+          "label": "Kernel name (-s)",
+          "flag": "-s",
+          "type": "checkbox",
+          "disables": [
+            "-a"
+          ]
+        },
+        {
+          "label": "Nodename (hostname) (-n)",
+          "flag": "-n",
+          "type": "checkbox",
+          "disables": [
+            "-a"
+          ]
+        },
+        {
+          "label": "Kernel release (-r)",
+          "flag": "-r",
+          "type": "checkbox",
+          "disables": [
+            "-a"
+          ]
+        },
+        {
+          "label": "Kernel version (-v)",
+          "flag": "-v",
+          "type": "checkbox",
+          "disables": [
+            "-a"
+          ]
+        },
+        {
+          "label": "Machine hardware (-m)",
+          "flag": "-m",
+          "type": "checkbox",
+          "disables": [
+            "-a"
+          ]
+        },
+        {
+          "label": "Processor (-p)",
+          "flag": "-p",
+          "type": "checkbox",
+          "disables": [
+            "-a"
+          ]
+        },
+        {
+          "label": "Hardware platform (-i)",
+          "flag": "-i",
+          "type": "checkbox",
+          "disables": [
+            "-a"
+          ]
+        },
+        {
+          "label": "Operating system (-o)",
+          "flag": "-o",
+          "type": "checkbox",
+          "disables": [
+            "-a"
+          ]
+        },
+        {
+          "label": "Output to file (Overwrite)",
+          "flag": ">",
+          "type": "file_save_as",
+          "tooltip": "Redirects output to a file, overwriting it (e.g., info.txt).",
+          "disables": [
+            ">>"
+          ]
+        },
+        {
+          "label": "Output to file (Append)",
+          "flag": ">>",
+          "type": "file_save_as",
+          "tooltip": "Appends output to the end of a file (e.g., info.log).",
+          "disables": [
+            ">"
+          ]
+        }
+      ]
+    },
+    "uptime": {
+      "description": "Show how long the system has been running, number of users, and load average.",
+      "example": "uptime -p",
+      "fields": [
+        {
+          "label": "Pretty format (-p)",
+          "flag": "-p",
+          "type": "checkbox",
+          "tooltip": "Show uptime in pretty format (e.g., 'up 2 hours, 10 minutes')."
+        }
+      ]
+    }
+  }
+}

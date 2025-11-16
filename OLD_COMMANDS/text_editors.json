@@ -1,0 +1,52 @@
+{
+  "Text Editors": {
+    "nano": {
+      "description": "Simple, user-friendly command-line text editor.",
+      "example": "nano +10 ~/.bashrc",
+      "fields": [
+        {
+          "label": "Go to Line Number",
+          "flag": "+",
+          "prefix_flag": true,
+          "type": "number_input",
+          "tooltip": "e.g., 10 (Starts the editor at line 10)"
+        },
+        {
+          "label": "File",
+          "flag": "",
+          "type": "file_picker",
+          "tooltip": "File to edit or create.\n\nCommon Keybinds:\n  Ctrl+O: Save (Write Out)\n  Ctrl+X: Exit\n  Ctrl+W: Find (Where Is)\n  Ctrl+K: Cut Line\n  Ctrl+C: Cancel"
+        }
+      ]
+    },
+    "vi": {
+      "description": "Classic visual text editor.",
+      "example": "vi /etc/hosts",
+      "fields": [
+        {
+          "label": "File",
+          "flag": "",
+          "type": "file_picker",
+          "tooltip": "File to edit or create (e.g., /etc/hosts)."
+        }
+      ]
+    },
+    "vim": {
+      "description": "Powerful modal text editor (Vi IMproved).",
+      "example": "vim /etc/ssh/sshd_config",
+      "fields": [
+        {
+          "label": "Read-only mode (-R)",
+          "flag": "-R",
+          "type": "checkbox"
+        },
+        {
+          "label": "File",
+          "flag": "",
+          "type": "file_picker",
+          "tooltip": "File to edit or create (e.g., /etc/ssh/sshd_config)."
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,105 @@
+{
+  "Service Management": {
+    "systemctl": {
+      "description": "Control the systemd system and service manager.",
+      "example": "sudo systemctl start sshd",
+      "sudo_optional": true,
+      "fields": [
+        {
+          "label": "Action",
+          "flag": "",
+          "type": "dropdown",
+          "options": [
+            "",
+            "start",
+            "stop",
+            "restart",
+            "reload",
+            "status",
+            "enable",
+            "disable",
+            "is-active"
+          ],
+          "tooltip": "The action to perform on the service.\n- start/stop: For the current session.\n- enable/disable: To start on boot.\nConflicts with 'List all unit files'.",
+          "disables": [
+            "list-unit-files"
+          ]
+        },
+        {
+          "label": "Service Name",
+          "flag": "",
+          "tooltip": "The name of the service (e.g., sshd, nginx, docker)."
+        },
+        {
+          "label": "List all unit files",
+          "flag": "list-unit-files",
+          "type": "checkbox",
+          "tooltip": "Show all installed service files and their status.\nConflicts with 'Action'.",
+          "disables": [
+            ""
+          ]
+        },
+        {
+          "label": "User services (--user)",
+          "flag": "--user",
+          "type": "checkbox",
+          "tooltip": "Manage services for your user, not the system.\nConflicts with 'sudo'.",
+          "disables_sudo_checkbox": true,
+          "disable_if_sudo": true
+        }
+      ]
+    },
+    "journalctl": {
+      "description": "Query the systemd journal (view system logs).",
+      "example": "journalctl -u nginx -f",
+      "sudo_optional": true,
+      "fields": [
+        {
+          "label": "Follow (like tail -f)",
+          "flag": "-f",
+          "type": "checkbox",
+          "tooltip": "Follow the journal live. Conflicts with time ranges (Since/Until).",
+          "disables": [
+            "-S",
+            "-U"
+          ]
+        },
+        {
+          "label": "Filter by Unit/Service",
+          "flag": "-u",
+          "tooltip": "Show logs for a specific service (e.g., sshd)."
+        },
+        {
+          "label": "Show kernel messages",
+          "flag": "-k",
+          "type": "checkbox",
+          "tooltip": "Show only kernel messages (like dmesg)."
+        },
+        {
+          "label": "Lines to show",
+          "flag": "-n",
+          "type": "number_input",
+          "tooltip": "Show the last N lines (e.g., 20). Default is 10."
+        },
+        {
+          "label": "Since",
+          "flag": "-S",
+          "tooltip": "Show logs since a time (e.g., '1h ago', '2025-11-06'). Conflicts with Follow.",
+          "auto_quote": true,
+          "disables": [
+            "-f"
+          ]
+        },
+        {
+          "label": "Until",
+          "flag": "-U",
+          "tooltip": "Show logs until a time (e.g., 'now', '10min ago'). Conflicts with Follow.",
+          "auto_quote": true,
+          "disables": [
+            "-f"
+          ]
+        }
+      ]
+    }
+  }
+}

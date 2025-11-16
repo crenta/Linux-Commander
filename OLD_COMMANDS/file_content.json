@@ -1,0 +1,170 @@
+{
+  "File Content": {
+    "cat": {
+      "description": "Concatenate and display the content of files.",
+      "example": "cat /etc/hosts",
+      "fields": [
+        {
+          "label": "File(s)",
+          "flag": "",
+          "type": "text",
+          "tooltip": "The file(s) to display. e.g., /etc/hosts"
+        },
+        {
+          "label": "Number all output lines (-n)",
+          "flag": "-n",
+          "type": "checkbox"
+        },
+        {
+          "label": "Show all characters (-A)",
+          "flag": "-A",
+          "type": "checkbox",
+          "tooltip": "Displays tabs as ^I and end-of-lines as $."
+        },
+        {
+          "label": "Squeeze blank lines (-s)",
+          "flag": "-s",
+          "type": "checkbox",
+          "tooltip": "Never more than one single blank line."
+        }
+      ]
+    },
+    "diff": {
+      "description": "Compare files line by line and show differences.",
+      "example": "diff -u original.conf updated.conf",
+      "fields": [
+        {
+          "label": "File 1",
+          "flag": "",
+          "type": "file_picker",
+          "tooltip": "First file to compare (e.g., original.txt)."
+        },
+        {
+          "label": "File 2",
+          "flag": "",
+          "type": "file_picker",
+          "tooltip": "Second file to compare (e.g., modified.txt)."
+        },
+        {
+          "label": "Unified format (-u)",
+          "flag": "-u",
+          "type": "checkbox",
+          "tooltip": "Output in unified diff format (better for patches)."
+        },
+        {
+          "label": "Ignore case (-i)",
+          "flag": "-i",
+          "type": "checkbox"
+        },
+        {
+          "label": "Ignore whitespace (-w)",
+          "flag": "-w",
+          "type": "checkbox"
+        }
+      ]
+    },
+    "head": {
+      "description": "Display the first part (head) of a file.",
+      "example": "head -n 20 /var/log/syslog",
+      "fields": [
+        {
+          "label": "File",
+          "flag": "",
+          "type": "file_picker",
+          "tooltip": "The file to read from (e.g., /var/log/syslog)."
+        },
+        {
+          "label": "Number of lines",
+          "flag": "-n",
+          "type": "number_input",
+          "tooltip": "How many lines to show from the top (e.g., 20). Default is 10."
+        }
+      ]
+    },
+    "less": {
+      "description": "View file contents one screen at a time. Better than 'more' for large files.",
+      "example": "less /var/log/nginx/access.log",
+      "fields": [
+        {
+          "label": "File",
+          "flag": "",
+          "type": "file_picker",
+          "tooltip": "File to view (e.g., /var/log/syslog)."
+        },
+        {
+          "label": "Line numbers (-N)",
+          "flag": "-N",
+          "type": "checkbox"
+        },
+        {
+          "label": "Case-insensitive search (-i)",
+          "flag": "-i",
+          "type": "checkbox",
+          "tooltip": "Makes searches inside 'less' case-insensitive."
+        }
+      ]
+    },
+    "tail": {
+      "description": "Display the last part (tail) of a file. Very useful for watching log files.",
+      "example": "tail -f /var/log/syslog",
+      "fields": [
+        {
+          "label": "File",
+          "flag": "",
+          "type": "file_picker",
+          "tooltip": "The file to read from (e.g., /var/log/syslog)."
+        },
+        {
+          "label": "Number of lines",
+          "flag": "-n",
+          "type": "number_input",
+          "tooltip": "How many lines to show from the bottom (e.g., 50). Default is 10."
+        },
+        {
+          "label": "Follow (watch for changes)",
+          "flag": "-f",
+          "type": "checkbox",
+          "tooltip": "Keeps the file open and shows new lines as they are added."
+        },
+        {
+          "label": "Retry if file unavailable",
+          "flag": "--retry",
+          "type": "checkbox",
+          "tooltip": "Keep trying to open the file if it doesn't exist yet."
+        }
+      ]
+    },
+    "wc": {
+      "description": "Word Count. Prints newline, word, and byte counts for each file.",
+      "example": "wc -l myfile.txt",
+      "fields": [
+        {
+          "label": "File",
+          "flag": "",
+          "type": "file_picker",
+          "tooltip": "The file to count. Leave blank for standard input."
+        },
+        {
+          "label": "Lines only (-l)",
+          "flag": "-l",
+          "type": "checkbox"
+        },
+        {
+          "label": "Words only (-w)",
+          "flag": "-w",
+          "type": "checkbox"
+        },
+        {
+          "label": "Characters only (-m)",
+          "flag": "-m",
+          "type": "checkbox"
+        },
+        {
+          "label": "Bytes only (-c)",
+          "flag": "-c",
+          "type": "checkbox"
+        }
+      ]
+    }
+  }
+}

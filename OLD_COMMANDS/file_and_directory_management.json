@@ -1,0 +1,323 @@
+{
+  "File & Directory Management": {
+    "cp": {
+      "description": "Copy files and directories from a source to a destination.",
+      "example": "cp -r /source/directory /destination/",
+      "sudo_optional": true,
+      "fields": [
+        {
+          "label": "Source",
+          "flag": "",
+          "type": "file_picker",
+          "tooltip": "The file or directory to copy."
+        },
+        {
+          "label": "Destination",
+          "flag": "",
+          "type": "dir_picker",
+          "tooltip": "The location or new filename to copy to."
+        },
+        {
+          "label": "Recursive (copy directories)",
+          "flag": "-r",
+          "type": "checkbox"
+        },
+        {
+          "label": "Verbose (show progress)",
+          "flag": "-v",
+          "type": "checkbox"
+        },
+        {
+          "label": "Preserve attributes (-p)",
+          "flag": "-p",
+          "type": "checkbox",
+          "tooltip": "Preserve mode, ownership, timestamps."
+        },
+        {
+          "label": "Interactive (-i)",
+          "flag": "-i",
+          "type": "checkbox",
+          "tooltip": "Prompt before overwrite."
+        }
+      ]
+    },
+    "ln": {
+      "description": "Create links between files (hard links or symbolic links).",
+      "example": "ln -s /path/to/original.txt /path/to/link.txt",
+      "fields": [
+        {
+          "label": "Target",
+          "flag": "",
+          "type": "file_picker",
+          "tooltip": "The existing file or directory to link to."
+        },
+        {
+          "label": "Link name",
+          "flag": "",
+          "type": "file_save_as",
+          "tooltip": "The name of the link to create."
+        },
+        {
+          "label": "Symbolic link (-s)",
+          "flag": "-s",
+          "type": "checkbox",
+          "tooltip": "Create a symbolic (soft) link instead of a hard link."
+        },
+        {
+          "label": "Force (-f)",
+          "flag": "-f",
+          "type": "checkbox",
+          "tooltip": "Remove existing destination files."
+        }
+      ]
+    },
+    "ls": {
+      "description": "List directory contents. Shows files and folders in the specified location.",
+      "example": "ls -lh /var/log",
+      "fields": [
+        {
+          "label": "Path",
+          "flag": "",
+          "type": "dir_picker",
+          "tooltip": "Directory to list (e.g., /var/log). Leave blank for current directory."
+        },
+        {
+          "label": "Long listing format (-l)",
+          "flag": "-l",
+          "type": "checkbox",
+          "tooltip": "Show detailed information (permissions, owner, size)."
+        },
+        {
+          "label": "Include hidden files (-a)",
+          "flag": "-a",
+          "type": "checkbox",
+          "tooltip": "Show all files, including those starting with ."
+        },
+        {
+          "label": "Human-readable sizes (-h)",
+          "flag": "-h",
+          "type": "checkbox",
+          "tooltip": "Show sizes in KB, MB, GB (use with -l)."
+        },
+        {
+          "label": "Recursive list (-R)",
+          "flag": "-R",
+          "type": "checkbox",
+          "tooltip": "List contents of subdirectories."
+        },
+        {
+          "label": "Sort by time (-t)",
+          "flag": "-t",
+          "type": "checkbox",
+          "tooltip": "Newest files first. Conflicts with Sort by size.",
+          "disables": [
+            "-S"
+          ]
+        },
+        {
+          "label": "Reverse order (-r)",
+          "flag": "-r",
+          "type": "checkbox"
+        },
+        {
+          "label": "Sort by size (-S)",
+          "flag": "-S",
+          "type": "checkbox",
+          "tooltip": "Largest files first. Conflicts with Sort by time.",
+          "disables": [
+            "-t"
+          ]
+        }
+      ]
+    },
+    "mkdir": {
+      "description": "Create new directories.",
+      "example": "mkdir -p /home/user/new/nested/dir",
+      "fields": [
+        {
+          "label": "Directory Name(s)",
+          "flag": "",
+          "type": "text",
+          "tooltip": "Name of the directory to create, e.g., my_folder. \nCan be multiple names separated by spaces."
+        },
+        {
+          "label": "Set permissions",
+          "flag": "-m",
+          "type": "number_input",
+          "tooltip": "Set permissions in octal format.\n\nCommon values:\n  755 (rwxr-xr-x): Owner all, others read/enter\n  700 (rwx------): Owner all, others no access\n  750 (rwxr-x---): Owner & Group can read/enter\n  777 (rwxrwxrwx): Everyone all (use cautiously)"
+        },
+        {
+          "label": "Create parent directories (-p)",
+          "flag": "-p",
+          "type": "checkbox",
+          "tooltip": "Creates parent directories as needed. \nUse this to create a nested path like /home/user/chris all at once."
+        }
+      ]
+    },
+    "mv": {
+      "description": "Move or rename files and directories.",
+      "example": "mv old_filename.txt new_filename.txt",
+      "sudo_optional": true,
+      "fields": [
+        {
+          "label": "Source",
+          "flag": "",
+          "type": "file_picker",
+          "tooltip": "The file or directory to move/rename."
+        },
+        {
+          "label": "Destination",
+          "flag": "",
+          "type": "dir_picker",
+          "tooltip": "The new location or new name."
+        },
+        {
+          "label": "Interactive (-i)",
+          "flag": "-i",
+          "type": "checkbox",
+          "tooltip": "Prompt before overwrite. Conflicts with No clobber.",
+          "disables": [
+            "-n"
+          ]
+        },
+        {
+          "label": "No clobber (-n)",
+          "flag": "-n",
+          "type": "checkbox",
+          "tooltip": "Don't overwrite existing files. Conflicts with Interactive.",
+          "disables": [
+            "-i"
+          ]
+        }
+      ]
+    },
+    "cd": {
+      "description": "Change the current working directory.",
+      "example": "cd /var/log",
+      "fields": [
+        {
+          "label": "Directory Path",
+          "flag": "",
+          "type": "dir_picker",
+          "tooltip": "Enter path:\n  /var/log (absolute)\n  .. (up one dir)\n  . (current dir)\n  ~ (your home)\n  ~user (another user's home)\n\nLeave blank to go home.",
+          "disables": [
+            "-"
+          ]
+        },
+        {
+          "label": "Go to previous directory (-)",
+          "flag": "-",
+          "type": "checkbox",
+          "tooltip": "Jump back to the last directory you were in.",
+          "disables": [
+            ""
+          ]
+        }
+      ]
+    },
+    "pwd": {
+      "description": "Print the full path of the current working directory.",
+      "example": "pwd",
+      "fields": []
+    },
+    "rm": {
+      "description": "Remove (delete) files or directories. Use with caution!",
+      "example": "rm -rf /path/to/unwanted_directory",
+      "sudo_optional": true,
+      "fields": [
+        {
+          "label": "File or Directory",
+          "flag": "",
+          "type": "file_picker",
+          "tooltip": "The item to remove. Separate multiple files with spaces."
+        },
+        {
+          "label": "Recursive (delete directories)",
+          "flag": "-r",
+          "type": "checkbox"
+        },
+        {
+          "label": "Force (ignore warnings)",
+          "flag": "-f",
+          "type": "checkbox",
+          "tooltip": "Ignore warnings. Conflicts with Interactive.",
+          "disables": [
+            "-i"
+          ]
+        },
+        {
+          "label": "Interactive (-i)",
+          "flag": "-i",
+          "type": "checkbox",
+          "tooltip": "Prompt before every removal. Conflicts with Force.",
+          "disables": [
+            "-f"
+          ]
+        }
+      ]
+    },
+    "touch": {
+      "description": "Create empty files or update timestamps of existing files.",
+      "example": "touch new_empty_file.txt",
+      "fields": [
+        {
+          "label": "File(s)",
+          "flag": "",
+          "type": "text",
+          "tooltip": "File(s) to create or update. Space-separated."
+        }
+      ]
+    },
+    "tree": {
+      "description": "List directory contents in a tree-like format.",
+      "example": "tree -L 2 /var/log",
+      "fields": [
+        {
+          "label": "Directory Path",
+          "flag": "",
+          "type": "dir_picker",
+          "tooltip": "Enter path to scan (e.g., /etc or ..). Leave blank to scan current directory."
+        },
+        {
+          "label": "Max depth to show (-L)",
+          "flag": "-L",
+          "type": "number_input",
+          "tooltip": "e.g., 2. Limits how many levels deep the tree will go."
+        },
+        {
+          "label": "Show hidden files (-a)",
+          "flag": "-a",
+          "type": "checkbox"
+        },
+        {
+          "label": "Show directories only (-d)",
+          "flag": "-d",
+          "type": "checkbox"
+        },
+        {
+          "label": "Human-readable sizes (-h)",
+          "flag": "-h",
+          "type": "checkbox"
+        },
+        {
+          "label": "Filter by pattern (-P)",
+          "flag": "-P",
+          "tooltip": "Show only files matching this pattern, e.g., *.txt",
+          "auto_quote": true,
+          "disables": [
+            "-I"
+          ]
+        },
+        {
+          "label": "Ignore by pattern (-I)",
+          "flag": "-I",
+          "tooltip": "Do not show files matching this pattern, e.g., *.log",
+          "auto_quote": true,
+          "disables": [
+            "-P"
+          ]
+        }
+      ]
+    }
+  }
+}

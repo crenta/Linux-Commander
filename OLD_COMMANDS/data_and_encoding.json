@@ -1,0 +1,52 @@
+{
+  "Data & Encoding": {
+    "base64": {
+      "description": "Encode or decode data as base64.",
+      "example": "echo 'hello' | base64",
+      "fields": [
+        {
+          "label": "Decode (-d)",
+          "flag": "-d",
+          "type": "checkbox",
+          "tooltip": "Decode data. Default is to encode."
+        },
+        {
+          "label": "File",
+          "flag": "",
+          "type": "file_picker",
+          "tooltip": "File to encode/decode. Leave blank for text input.\n\nHTB Tip:\nUsed to obscure data or shells. e.g., echo 'bash -i...' | base64"
+        }
+      ]
+    },
+    "xxd": {
+      "description": "Creates a hex dump of a file or standard input.",
+      "example": "xxd my_binary",
+      "fields": [
+        {
+          "label": "Reverse (hex -> binary)",
+          "flag": "-r",
+          "type": "checkbox",
+          "tooltip": "Reverses a hex dump back into its original binary form.\nConflicts with 'Columns'.",
+          "disables": [
+            "-c"
+          ]
+        },
+        {
+          "label": "Columns (bytes per line)",
+          "flag": "-c",
+          "type": "number_input",
+          "tooltip": "e.g., 16 (Default). Ignored if 'Reverse' is checked.\nConflicts with 'Reverse'.",
+          "disables": [
+            "-r"
+          ]
+        },
+        {
+          "label": "File",
+          "flag": "",
+          "type": "file_picker",
+          "tooltip": "File to process. Leave blank for text input.\n\nPen Testing Tip:\nUseful for analyzing binary file formats or creating shellcode."
+        }
+      ]
+    }
+  }
+}
