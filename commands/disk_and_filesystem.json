@@ -9,7 +9,8 @@
           "label": "Device",
           "flag": "",
           "type": "file_picker",
-          "tooltip": "The disk device to manipulate, e.g., /dev/sda"
+          "tooltip": "The disk device to manipulate, e.g., /dev/sda",
+          "max_length": 4096
         },
         {
           "label": "List partitions (-l)",
@@ -27,7 +28,8 @@
           "label": "Device",
           "flag": "",
           "type": "file_picker",
-          "tooltip": "The partition to check, e.g., /dev/sda1"
+          "tooltip": "The partition to check, e.g., /dev/sda1",
+          "max_length": 4096
         },
         {
           "label": "Filesystem type",
@@ -72,12 +74,15 @@
           "label": "Device",
           "flag": "",
           "type": "file_picker",
-          "tooltip": "The partition to format, e.g., /dev/sdb1"
+          "tooltip": "The partition to format, e.g., /dev/sdb1",
+          "max_length": 4096
         },
         {
           "label": "Label",
           "flag": "-L",
-          "tooltip": "Filesystem label/name (e.g., USB_DRIVE)."
+          "type": "text",
+          "tooltip": "Filesystem label/name (e.g., USB_DRIVE).",
+          "max_length": 255
         }
       ]
     },
@@ -90,13 +95,15 @@
           "label": "Device",
           "flag": "",
           "type": "file_picker",
-          "tooltip": "The partition to mount, e.g., /dev/sdb1"
+          "tooltip": "The partition to mount, e.g., /dev/sdb1",
+          "max_length": 4096
         },
         {
           "label": "Mount point",
           "flag": "",
           "type": "dir_picker",
-          "tooltip": "Directory to mount at, e.g., /mnt/usb"
+          "tooltip": "Directory to mount at, e.g., /mnt/usb",
+          "max_length": 4096
         },
         {
           "label": "Filesystem type",
@@ -116,7 +123,9 @@
         {
           "label": "Options",
           "flag": "-o",
-          "tooltip": "e.g., ro (read-only), noexec"
+          "type": "text",
+          "tooltip": "e.g., ro (read-only), noexec",
+          "max_length": 1000
         }
       ]
     },
@@ -129,7 +138,8 @@
           "label": "Mount point or device",
           "flag": "",
           "type": "text",
-          "tooltip": "e.g., /mnt/usb or /dev/sdb1"
+          "tooltip": "e.g., /mnt/usb or /dev/sdb1",
+          "max_length": 4096
         },
         {
           "label": "Force (-f)",
