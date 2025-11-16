@@ -9,13 +9,16 @@
           "flag": "+",
           "prefix_flag": true,
           "type": "number_input",
-          "tooltip": "e.g., 10 (Starts the editor at line 10)"
+          "tooltip": "e.g., 10 (Starts the editor at line 10)",
+          "min": 1,
+          "max": 99999
         },
         {
           "label": "File",
           "flag": "",
           "type": "file_picker",
-          "tooltip": "File to edit or create.\n\nCommon Keybinds:\n  Ctrl+O: Save (Write Out)\n  Ctrl+X: Exit\n  Ctrl+W: Find (Where Is)\n  Ctrl+K: Cut Line\n  Ctrl+C: Cancel"
+          "tooltip": "File to edit or create.\n\nCommon Keybinds:\n  Ctrl+O: Save (Write Out)\n  Ctrl+X: Exit\n  Ctrl+W: Find (Where Is)\n  Ctrl+K: Cut Line\n  Ctrl+C: Cancel",
+          "max_length": 4096
         }
       ]
     },
@@ -27,7 +30,8 @@
           "label": "File",
           "flag": "",
           "type": "file_picker",
-          "tooltip": "File to edit or create (e.g., /etc/hosts)."
+          "tooltip": "File to edit or create (e.g., /etc/hosts).",
+          "max_length": 4096
         }
       ]
     },
@@ -44,7 +48,8 @@
           "label": "File",
           "flag": "",
           "type": "file_picker",
-          "tooltip": "File to edit or create (e.g., /etc/ssh/sshd_config)."
+          "tooltip": "File to edit or create (e.g., /etc/ssh/sshd_config).",
+          "max_length": 4096
         }
       ]
     }
