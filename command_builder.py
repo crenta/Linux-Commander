@@ -1,28 +1,83 @@
 import json
+import sys
 import tkinter as tk
 from tkinter import ttk, messagebox, scrolledtext, filedialog
 import pyperclip
 from pathlib import Path
-import ai_analyzer 
 import webbrowser
 import re
 import datetime
 import calendar
 from PIL import Image, ImageTk
-import settings_panel
+import os
+import threading
+import shlex
+
+# --- Optional Modules (Graceful Degradation) ---
+try:
+    import ai_analyzer
+    AI_AVAILABLE = True
+except ImportError:
+    AI_AVAILABLE = False
+    print("Warning: ai_analyzer.py not found. AI features disabled.")
+
+try:
+    import settings_panel
+    SETTINGS_AVAILABLE = True
+except ImportError:
+    SETTINGS_AVAILABLE = False
+    print("Warning: settings_panel.py not found. Settings features disabled.")
+    
+try:
+    import update_manager
+    UPDATE_MANAGER_AVAILABLE = True
+except ImportError:
+    UPDATE_MANAGER_AVAILABLE = False
+    print("Warning: update_manager.py not found. Update features disabled.")
+
+
+def get_resource_path(relative_path):
+    """Get absolute path to BUNDLED resource (read-only)"""
+    try:
+        # PyInstaller extracts bundled files here
+        base_path = Path(sys._MEIPASS)
+    except AttributeError:
+        base_path = Path(__file__).parent
+    return base_path / relative_path
+
+def get_data_dir():
+    """Get persistent user data directory (writable)"""
+    if getattr(sys, 'frozen', False):
+        # Running as executable - use OS-specific location
+        if sys.platform == 'win32':
+            data_dir = Path(os.environ.get('LOCALAPPDATA', Path.home())) / 'LinuxCommander'
+        elif sys.platform == 'darwin':
+            data_dir = Path.home() / 'Library' / 'Application Support' / 'LinuxCommander'
+        else:
+            data_dir = Path.home() / '.local' / 'share' / 'LinuxCommander'
+    else:
+        # Running from source - use local directory
+        data_dir = Path(__file__).parent
+    
+    return data_dir
 
 # --- Constants ---
-COMMANDS_DIR = Path(__file__).parent / "commands"
+APP_DIR = get_resource_path(".")  # For bundled resources like logo
+BUNDLED_COMMANDS_DIR = get_resource_path("commands")  # Read-only bundled commands
+USER_COMMANDS_DIR = get_data_dir() / "commands"  # Writable user location
+COMMANDS_DIR = USER_COMMANDS_DIR
 WINDOW_GEOMETRY = "900x700"
+logo_path = get_resource_path("LOGO.png")
 APP_TITLE = "Linux Command Builder"
 
 class CommandBuilderApp:
+    
     def __init__(self, root):
         self.root = root
         self.root.title(APP_TITLE)
         self.root.geometry(WINDOW_GEOMETRY)
         
-        # --- NEW: Setup Theme First ---
+        # --- Setup Theme First ---
         self._setup_theme()
         # ------------------------------
         
@@ -30,7 +85,7 @@ class CommandBuilderApp:
         self.ai_result_window = None 
         self._current_msg = None
 
-        # --- NEW: BIND CLICK ON MAIN WINDOW TO AUTO-CLOSE NOTIFICATIONS ---
+        # --- BIND CLICK ON MAIN WINDOW TO AUTO-CLOSE NOTIFICATIONS ---
         # 'add=+' ensures we don't overwrite other necessary bindings
         self.root.bind("<Button-1>", self._auto_close_msg, add="+")
         self.root.bind("<Button-1>", self._on_background_click, add="+")
@@ -109,38 +164,123 @@ class CommandBuilderApp:
             "number_input": self._is_active_var
         }
         # --- End Dispatch Dictionaries ---
-
-        self.COMMANDS_DATA = {}
-        if not COMMANDS_DIR.exists():
-            messagebox.showerror("Error", f"Commands directory not found:\n{COMMANDS_DIR}")
-            self.root.destroy()
-            return
-            
-        for json_file in COMMANDS_DIR.glob("*.json"):
-            try:
-                with open(json_file) as f:
-                    category_data = json.load(f)
-                    self.COMMANDS_DATA.update(category_data)
-            except json.JSONDecodeError as e:
-                messagebox.showerror("JSON Error", f"Error loading {json_file.name}:\n{e}")
-            except Exception as e:
-                messagebox.showerror("Error", f"Could not load {json_file.name}:\n{e}")
         
-        if not self.COMMANDS_DATA:
-             messagebox.showerror("Error", f"No commands found in {COMMANDS_DIR}")
-             self.root.destroy()
-             return
+        # --- COMMAND LOADING ---
+        self.COMMANDS_DATA = {}
 
+        # Initialize update manager BEFORE loading commands
+        self.update_manager = None
+        if UPDATE_MANAGER_AVAILABLE:
+            theme_config = {
+                "BG_DARK": self.BG_DARK,
+                "BG_DARKER": self.BG_DARKER,
+                "FG_LIGHT": self.FG_LIGHT,
+                "FG_DIM": self.FG_DIM,
+                "ACCENT_GREEN": self.ACCENT_GREEN,
+                "ACCENT_DARK": self.ACCENT_DARK,
+                "ERROR_RED": self.ERROR_RED
+            }
+            self.update_manager = update_manager.UpdateManager(
+                self.root,
+                COMMANDS_DIR,
+                theme_config,
+                on_update_complete=self.reload_commands
+            )
+
+        # --- Initialize widget tracking variables ---
         self.widget_vars = []
         self.current_command_info = {}
         self.permission_vars = {}
         self.sudo_var = tk.BooleanVar()
 
+        # --- BUILD THE UI (THIS WAS MISSING!) ---
         self._setup_main_ui()
+        
+        # Load commands from disk
+        self._load_commands()
+        
+        # --- POPULATE THE COMMAND TREE (THIS WAS MISSING!) ---
         self._populate_command_tree()
 
-    # --- EDIT ---
-    # --- NEW METHOD: Centralized Theme Setup ---
+    # --- COMMAND LOADING METHOD ---
+    def _load_commands(self):
+        """Load commands from disk - no auto-download."""
+        # Try user directory first, then bundled
+        bundled_dir = get_resource_path("commands")
+        
+        if COMMANDS_DIR.exists() and any(COMMANDS_DIR.glob("*.json")):
+            load_from = COMMANDS_DIR
+        elif bundled_dir.exists() and any(bundled_dir.glob("*.json")):
+            load_from = bundled_dir
+        else:
+            # No commands found - first run scenario
+            if UPDATE_MANAGER_AVAILABLE:
+                msg = ("No command files found.\n\n"
+                    "This appears to be your first run.\n"
+                    "Would you like to download command files now?")
+                if messagebox.askyesno("First Run Setup", msg):
+                    self.root.after(100, self.open_update_manager)
+            else:
+                messagebox.showerror("Setup Required", 
+                    "No command files found and Update Manager is unavailable.\n\n"
+                    "Please manually download the 'commands' folder from:\n"
+                    "https://github.com/crenta/Linux-Commander")
+            return
+        
+        # Load all JSON files
+        load_errors = []
+        for json_file in load_from.glob("*.json"):
+            if json_file.name.startswith("."):  # Skip hidden files like .local_hashes.json
+                continue
+            
+            try:
+                with open(json_file, 'r', encoding='utf-8') as f:
+                    self.COMMANDS_DATA.update(json.load(f))
+            except json.JSONDecodeError as e:
+                load_errors.append(f"{json_file.name}: Invalid JSON at line {e.lineno}")
+            except Exception as e:
+                load_errors.append(f"{json_file.name}: {str(e)}")
+        
+        # Handle corrupted files
+        if load_errors:
+            error_summary = "\n".join(load_errors[:4])
+            if len(load_errors) > 4:
+                error_summary += f"\n...and {len(load_errors) - 4} more."
+            
+            if UPDATE_MANAGER_AVAILABLE:
+                msg = (f"Some command files failed to load:\n\n{error_summary}\n\n"
+                    "Would you like to re-download these files?")
+                if messagebox.askyesno("Loading Errors", msg):
+                    self.root.after(100, self.open_update_manager)
+            else:
+                messagebox.showerror("Loading Errors", 
+                    f"Some files are corrupted:\n\n{error_summary}")
+        
+        # Final check
+        if not self.COMMANDS_DATA:
+            messagebox.showerror("Fatal Error", 
+                "No valid command files could be loaded.\n\n"
+                "Please use the Update Manager to download fresh files.")
+
+    # edit
+    def reload_commands(self):
+        """Reload commands after update - called by update manager."""
+        self.COMMANDS_DATA.clear()
+        self._load_commands()
+        
+        # Refresh the command tree
+        for item in self.command_tree.get_children():
+            self.command_tree.delete(item)
+        self._populate_command_tree()
+        
+        # Show success message
+        self._show_styled_message("Success", 
+            f"Commands reloaded successfully!\n\n"
+            f"Total commands available: {len(self.COMMANDS_DATA)}")
+
+
+
+    # --- METHOD: Centralized Theme Setup ---
     def _setup_theme(self):
         """Defines colors and configures ttk styles for a hacker aesthetic."""
         self.BG_DARK = "#1e1e1e"
@@ -150,7 +290,7 @@ class CommandBuilderApp:
         self.ACCENT_GREEN = "#00C853"
         self.ACCENT_DARK = "#005020"
         self.ERROR_RED = "#ff5252"
-        self.WARNING_ORANGE = "#FFAB40" # <-- NEW COLOR for mutual exclusion
+        self.WARNING_ORANGE = "#FFAB40" # not used
 
         self.root.configure(bg=self.BG_DARK)
 
@@ -168,6 +308,13 @@ class CommandBuilderApp:
                     borderwidth=1, focuscolor=self.ACCENT_GREEN, bordercolor=self.ACCENT_DARK)
         s.map("TButton", background=[('active', self.ACCENT_DARK), ('pressed', self.ACCENT_GREEN)],
                          foreground=[('pressed', self.BG_DARKER)])
+        
+        # Disabled Button Style
+        s.configure("DisabledRed.TButton", background=self.BG_DARKER, foreground=self.ERROR_RED, borderwidth=1, bordercolor=self.ACCENT_DARK)
+        s.map("DisabledRed.TButton", 
+              foreground=[('disabled', self.ERROR_RED)],
+              background=[('disabled', self.BG_DARKER)],
+              bordercolor=[('disabled', self.ACCENT_DARK)])
         
         s.configure("TButton", focuscolor=self.BG_DARKER)
 
@@ -202,7 +349,7 @@ class CommandBuilderApp:
         self.root.option_add('*TCombobox*Listbox.selectBackground', self.ACCENT_DARK)
         self.root.option_add('*TCombobox*Listbox.selectForeground', self.FG_LIGHT)
 
-        # --- UPDATED Checkbutton Mapping for Green/Orange text ---
+        # --- Checkbutton Mapping for Green/Orange text ---
         s.configure("TCheckbutton", background=self.BG_DARK, foreground=self.FG_LIGHT, 
                     indicatorcolor=self.BG_DARKER, indicatorrelief='flat')
         s.map("TCheckbutton", 
@@ -226,6 +373,17 @@ class CommandBuilderApp:
         s.configure("TSeparator", background=self.BG_DARKER)
         s.configure("Vertical.TScrollbar", background=self.BG_DARK, troughcolor=self.BG_DARKER, 
                     bordercolor=self.BG_DARK, arrowcolor=self.ACCENT_GREEN)
+        
+        s.configure("Invalid.TEntry", 
+                fieldbackground=self.BG_DARKER, 
+                foreground=self.ERROR_RED,
+                bordercolor=self.ERROR_RED,
+                borderwidth=2,
+                insertcolor=self.ERROR_RED)
+        s.map("Invalid.TEntry",
+            bordercolor=[('focus', self.ERROR_RED), ('!focus', self.ERROR_RED)],
+            lightcolor=[('focus', self.ERROR_RED), ('!focus', self.ERROR_RED)],
+            darkcolor=[('focus', self.ERROR_RED), ('!focus', self.ERROR_RED)])
 
         # Custom Named Styles
         s.configure("Title.TLabel", font=("Helvetica", 14, "bold"), foreground=self.ACCENT_GREEN)
@@ -234,12 +392,40 @@ class CommandBuilderApp:
         s.configure("Description.TLabel", font=("Helvetica", 10), foreground=self.FG_LIGHT)
         s.configure("Example.TLabel", font=("Courier", 9), foreground=self.ACCENT_GREEN)
         s.configure("Sudo.TCheckbutton", font=("Helvetica", 9, "bold"))
-        s.map("Sudo.TCheckbutton", foreground=[('!disabled', self.ERROR_RED), ('disabled', self.FG_DIM)])
-        # ----- EDIT ------        
+        s.map("Sudo.TCheckbutton", foreground=[('!disabled', self.ERROR_RED), ('disabled', self.FG_DIM)])      
+
+    # --- SECURITY: Shell Injection Prevention ---
+    def _sanitize_for_shell(self, value):
+        """
+        Safely escapes a value for shell command use.
+        Uses shlex.quote() to prevent command injection attacks.
         
-
-
-    # --- NEW: AUTO-CLOSE HANDLER ---
+        Args:
+            value: String to sanitize
+            
+        Returns:
+            Safely quoted string ready for shell use
+            
+        Example:
+            >>> _sanitize_for_shell("test'; rm -rf /")
+            'test'"'"'; rm -rf /'  # Now safe - literal string, not code
+        """
+        if not value:
+            return value
+        
+        str_value = str(value)
+        
+        # Prevent DoS via extremely long inputs (Linux ARG_MAX is ~2MB)
+        MAX_LENGTH = 8000
+        if len(str_value) > MAX_LENGTH:
+            # Silently truncate instead of crashing
+            # The widget validation already warned the user
+            return shlex.quote(str_value[:MAX_LENGTH])
+        
+        return shlex.quote(str_value)
+        # --- End Security Method ---
+    
+    # --- AUTO-CLOSE HANDLER ---
     def _auto_close_msg(self, event):
         """Closes the custom message window if it exists and the user clicks main window."""
         if hasattr(self, '_current_msg') and self._current_msg and self._current_msg.winfo_exists():
@@ -268,8 +454,7 @@ class CommandBuilderApp:
         rw, rh = self.root.winfo_width(), self.root.winfo_height()
         rx, ry = self.root.winfo_x(), self.root.winfo_y()
         
-        # --- UPDATED SIZE HERE ---
-        mw, mh = 500, 220 # Increased from 350x150 to 500x220
+        mw, mh = 500, 220
         # -------------------------
         
         msg_win.geometry(f"{mw}x{mh}+{rx + (rw//2 - mw//2)}+{ry + (rh//2 - mh//2)}")
@@ -279,12 +464,11 @@ class CommandBuilderApp:
         title_label = ttk.Label(msg_win, text=title, font=("Helvetica", 14, "bold"), foreground=accent)
         title_label.pack(pady=(30, 15), padx=20)
 
-        # Increased wraplength to match new window width
         msg_label = ttk.Label(msg_win, text=message, wraplength=460, justify="center", font=("Helvetica", 11))
-        msg_label.pack(pady=(0, 30), padx=20, expand=True) # Added expand=True to help centering
+        msg_label.pack(pady=(0, 30), padx=20, expand=True)
 
         ok_btn = ttk.Button(msg_win, text="OK", command=msg_win.destroy, style="TButton")
-        ok_btn.pack(pady=(0, 30), ipadx=10) # Added ipadx for a wider button
+        ok_btn.pack(pady=(0, 30), ipadx=10)
         
         ok_btn.focus_set()
         msg_win.bind("<Return>", lambda e: msg_win.destroy())
@@ -328,8 +512,27 @@ class CommandBuilderApp:
         """Safely opens a URL in the default web browser."""
         if url.startswith("http://") or url.startswith("https://"):
             webbrowser.open_new_tab(url)
+           
+    # --- PATH SETTER HELPER --- 
+    def _set_path(self, var, path):
+        """Updates variable with POSIX-style path only if valid."""
+        if not path:
+            return
+        
+        # Validate characters
+        is_valid, error_msg = self._validate_path_chars(path)
+        if not is_valid:
+            self._show_styled_message("Invalid Path", error_msg, is_warning=True)
+            return
+        
+        var.set(Path(path).as_posix())
+             
+    def _show_text_logo_fallback(self, parent_frame):
+        """Displays text when the logo image cannot be loaded."""
+        fallback_label = ttk.Label(parent_frame, text="L-COMMANDER", style="Title.TLabel", font=("Helvetica", 20, "bold"))
+        fallback_label.pack(anchor="w", padx=(10, 0), pady=(10, 15))
 
-    # --- NEW HELPER: Validation for number_input ---
+    # --- HELPER: Validation for number_input ---
     def _validate_numeric_input(self, P):
         """Validates that the input is a digit or empty."""
         if P.isdigit() or P == "":
@@ -337,7 +540,6 @@ class CommandBuilderApp:
         return False
 
     def _on_form_mousewheel(self, event):
-        # (Unchanged)
         scroll_region = self.form_canvas.bbox("all")
         if scroll_region:
             content_height = scroll_region[3] - scroll_region[1]
@@ -346,9 +548,8 @@ class CommandBuilderApp:
                 self.form_canvas.focus_set()
                 self.form_canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
-    # edit
+    # --- Recursive Mousewheel Binding ---
     def _bind_mousewheel_recursive(self, widget):
-            # (Unchanged)
             if widget.winfo_class() == 'TCombobox':
                 widget.bind('<MouseWheel>', lambda e: "break")
             else:
@@ -358,7 +559,6 @@ class CommandBuilderApp:
                 self._bind_mousewheel_recursive(child)
 
     def _on_tree_keypress(self, event):
-        # (Unchanged)
         if event.keysym in ('Shift_L', 'Shift_R', 'Control_L', 'Control_R', 'Alt_L', 'Alt_R', 'Caps_Lock'):
             return
         if event.keysym == 'BackSpace':
@@ -373,24 +573,20 @@ class CommandBuilderApp:
         return "break"
 
     def _on_escape(self, event):
-        # (Unchanged)
         self.search_var.set("")
         self.command_tree.focus_set()
 
     def _setup_main_ui(self):
-        
-        # edit
         main_container = ttk.Frame(self.root)
         main_container.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
         # Left frame with a fixed width that fits your longest text
-        left_frame = ttk.Frame(main_container, width=240) # <-- ADJUST THIS VALUE
+        left_frame = ttk.Frame(main_container, width=240)
         left_frame.pack(side=tk.LEFT, fill=tk.Y, padx=(0, 10))
         # Prevent it from shrinking if its content is smaller
         left_frame.pack_propagate(False)
         
         # --- LOGO INTEGRATION START (Multi-Size Icons) ---
-        logo_path = Path(__file__).parent / "Lcomm_Logo.png"
         if logo_path.exists():
             try:
                 # 1. Load original image with Pillow
@@ -416,6 +612,10 @@ class CommandBuilderApp:
 
             except Exception as e:
                 print(f"Error loading logo: {e}")
+                
+        else:
+            # Fallback if file is missing entirely
+            self._show_text_logo_fallback(left_frame)
         # --- LOGO INTEGRATION END ---
         
         list_label = ttk.Label(left_frame, text="Commands", style="Title.TLabel")
@@ -431,8 +631,7 @@ class CommandBuilderApp:
         tree_container.pack(fill=tk.BOTH, expand=True)
         self.command_tree = ttk.Treeview(tree_container, show="tree")
         
-        # edit
-        # --- NEW: Smooth Scrolling (Stabilized with Focus) ---
+        # --- Smooth Scrolling (Stabilized with Focus) ---
         def _on_tree_mousewheel(event):
             # 1. Force focus to the tree. This stops the "hover" highlight 
             #    from fighting with the scroll action.
@@ -458,7 +657,6 @@ class CommandBuilderApp:
         self.root.bind("<Escape>", self._on_escape)
         self.command_tree.bind("<<TreeviewSelect>>", self.on_command_select)
         
-        # edit
         right_frame = ttk.Frame(main_container)
         right_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         
@@ -508,26 +706,62 @@ class CommandBuilderApp:
         clear_button = ttk.Button(button_frame, text="Clear Form", command=self.clear_form)
         clear_button.pack(side=tk.RIGHT, padx=(0, 5))
         
-        analyze_button = ttk.Button(button_frame, text="Analyze with AI 🤖", command=self.analyze_with_ai)
+        # edit
+        # --- AI ANALYZER BUTTON ---
+        if AI_AVAILABLE:
+            analyze_button = ttk.Button(button_frame, text="Analyze with AI 🤖", command=self.analyze_with_ai)
+        else:
+            analyze_button = ttk.Button(button_frame, text="AI Unavailable ⚠️", state="disabled", style="DisabledRed.TButton")
         analyze_button.pack(side=tk.RIGHT, padx=(0, 5))
-        
-        settings_btn = ttk.Button(button_frame, text="AI Settings ⚙️", command=self.open_settings, style="TButton")
+
+        # --- SETTINGS BUTTON ---
+        if SETTINGS_AVAILABLE and AI_AVAILABLE:
+            settings_btn = ttk.Button(button_frame, text="AI Settings ⚙️", command=self.open_settings)
+        else:
+            settings_btn = ttk.Button(button_frame, text="Settings ⚠️", state="disabled", style="DisabledRed.TButton")
         settings_btn.pack(side=tk.RIGHT, padx=(0, 5))
 
-    # edit
+        # --- UPDATE MANAGER BUTTON ---
+        if UPDATE_MANAGER_AVAILABLE and self.update_manager:
+            update_btn = ttk.Button(button_frame, text="Check Updates 🔄", command=self.open_update_manager)
+        else:
+            update_btn = ttk.Button(button_frame, text="Updates ⚠️", state="disabled", style="DisabledRed.TButton")
+        update_btn.pack(side=tk.RIGHT, padx=(0, 5))
+
+    # --- SETTINGS PANEL OPENER ---
     def open_settings(self):
         """Opens the AI settings configuration panel."""
+        if not SETTINGS_AVAILABLE:
+             self._show_styled_message("Error", "Settings panel module is missing.", is_warning=True)
+             return
         settings_panel.SettingsPanel(self.root)
 
-    # edit
+    # --- UPDATE MANAGER OPENER ---
+    def open_update_manager(self):
+        """Opens the update manager window."""
+        if not UPDATE_MANAGER_AVAILABLE:
+            self._show_styled_message("Error", 
+                "Update manager module is missing.", is_warning=True)
+            return
+        
+        if self.update_manager:
+            self.update_manager.open_update_window()
+        else:
+            self._show_styled_message("Error", 
+                "Update manager failed to initialize.", is_warning=True)
+
+    # --- AI ANALYZER OPENER ---
     def analyze_with_ai(self):
+        if not AI_AVAILABLE:
+             self._show_styled_message("Error", "AI analyzer module is missing.", is_warning=True)
+             return
         command = self.cmd_box.get(1.0, tk.END).strip()
         if not command or command == self.current_command_info.get("name"):
-            # --- UPDATED: Use custom message instead of native messagebox ---
+            # --- Use custom message instead of native messagebox ---
             self._show_styled_message("Incomplete Command", "Please build a more complete command to analyze.", is_warning=True)
             return
 
-        # --- NEW: Close previous result window if it exists ---
+        # --- Close previous result window if it exists ---
         if self.ai_result_window and self.ai_result_window.winfo_exists():
             self.ai_result_window.destroy()
         # ----------------------------------------------------
@@ -540,8 +774,7 @@ class CommandBuilderApp:
         splash_w, splash_h = 400, 120
         splash_img = None
         
-        # 2. TRY LOADING IMAGE (High-Quality Pillow Resize)
-        logo_path = Path(__file__).parent / "Lcomm_Logo.png"
+        # 2. LOAD & RESIZE LOGO FOR SPLASH
         if logo_path.exists():
             try:
                 pil_img = Image.open(logo_path)
@@ -589,7 +822,7 @@ class CommandBuilderApp:
         r_x = main_x + (main_w // 2) - (r_w // 2)
         r_y = main_y + (main_h // 2) - (r_h // 2)
         
-        # --- CHANGED: Use self.ai_result_window instead of local variable ---
+        # --- Use self.ai_result_window instead of local variable ---
         self.ai_result_window = tk.Toplevel(self.root)
         self.ai_result_window.title(f"AI Analysis: {self.current_command_info.get('name')}")
         self.ai_result_window.transient(self.root)
@@ -604,12 +837,14 @@ class CommandBuilderApp:
         result_text.pack(expand=True, fill="both", padx=10, pady=10)
         # --------------------------------------------------------------------
 
-        # 6. RUN AI & SWAP
-        ai_response = ai_analyzer.analyze_command(command)
+        # 6. RUN AI & SWAP (WITH ERROR HANDLING)
+        try:
+            ai_response = ai_analyzer.analyze_command(command)
+        except Exception as e:
+            ai_response = f"❌ **AI Analysis Failed**\n\nError details:\n{str(e)}\n\nPlease check your settings and internet connection."
+
         splash.grab_release()
         splash.destroy()
-        
-        # Show the new window
         self.ai_result_window.deiconify()
 
         # 7. POPULATE RESULTS
@@ -629,7 +864,6 @@ class CommandBuilderApp:
         result_text.config(state="disabled")
         
     def _populate_command_tree(self):
-        # (Unchanged)
         for category_name in sorted(self.COMMANDS_DATA.keys()):
             commands = self.COMMANDS_DATA[category_name]
             self.command_tree.insert("", "end", text=category_name, iid=category_name, open=True)
@@ -637,7 +871,6 @@ class CommandBuilderApp:
                 self.command_tree.insert(category_name, "end", text=command_name, iid=command_name)
 
     def _filter_tree(self):
-        # (Unchanged)
         search_text = self.search_var.get().lower()
         for item in self.command_tree.get_children(): self.command_tree.delete(item)
         for category_name in sorted(self.COMMANDS_DATA.keys()):
@@ -650,9 +883,8 @@ class CommandBuilderApp:
                 else: commands_to_show = matching_commands
                 for command_name in commands_to_show: self.command_tree.insert(cat_id, "end", text=command_name, iid=command_name)
     
-    # --- REFACTORED: clear_form ---
+    # --- clear_form ---
     def clear_form(self):
-        # (Unchanged)
         for item in self.widget_vars:
             item_type = item.get("type", "text")
             clearer_func = self._widget_clearers.get(item_type, self._clear_widget_text)
@@ -665,7 +897,6 @@ class CommandBuilderApp:
         self._on_form_change()
 
     def on_command_select(self, event):
-        # (Unchanged)
         selected_id = self.command_tree.focus()
         if not selected_id or not self.command_tree.parent(selected_id): return
         
@@ -697,39 +928,31 @@ class CommandBuilderApp:
         self._on_form_change()
 
     def _on_form_change(self, *args):
-        # (Unchanged)
         self._update_widget_states()
         self.update_command_display()
 
-    # --- REFACTORED: _update_widget_states (and its helpers) ---
+    # --- _update_widget_states (and its helpers) ---
     def _is_active_checkbox(self, item):
-        # (Unchanged)
         return item.get("var") and item["var"].get()
 
     def _is_active_url(self, item):
-        # (Unchanged)
         return item.get("url_var") and item["url_var"].get().strip()
 
     def _is_active_file_w_ext(self, item):
-        # (Unchanged)
         return item.get("base_var") and item["base_var"].get().strip()
 
     def _is_active_var(self, item):
-        # (Unchanged)
         return item.get("var") and item["var"].get().strip()
 
     def _is_active_num_var(self, item):
-        # (Unchanged)
         return item.get("num_var") and item["num_var"].get().strip()
 
     def _is_active_date_input(self, item):
-        # (Unchanged)
         return (item.get("year_var") and item["year_var"].get() and
                 item.get("month_var") and item["month_var"].get() and
                 item.get("day_var") and item["day_var"].get())
 
     def _update_widget_states(self):
-        # (Unchanged)
         flags_to_disable = set()
         should_disable_sudo = False
 
@@ -773,9 +996,8 @@ class CommandBuilderApp:
                 else:
                     widget.config(state=tk.NORMAL)
 
-    # --- REFACTORED: build_form ---
+    # --- build_form ---
     def build_form(self):
-        # (Unchanged)
         for field_data in self.current_command_info["data"]["fields"]:
             frame = ttk.Frame(self.form_frame)
             frame.pack(fill=tk.X, pady=4)
@@ -797,9 +1019,8 @@ class CommandBuilderApp:
                 
         self._bind_mousewheel_recursive(self.form_frame)
 
-    # --- REFACTORED: update_command_display ---
+    # --- update_command_display ---
     def update_command_display(self, *args):
-        # (Unchanged)
         if not self.current_command_info: return
         
         command_name = self.current_command_info["name"]
@@ -851,7 +1072,6 @@ class CommandBuilderApp:
         self.cmd_box.config(state="disabled")
 
     def copy_command(self):
-        # (Unchanged but using new message system)
         command = self.cmd_box.get(1.0, tk.END).strip()
         if not command or command == self.current_command_info.get("name"):
             self._show_styled_message("No Command", "The command is not complete yet!", is_warning=True)
@@ -862,7 +1082,6 @@ class CommandBuilderApp:
     # --- Helper Methods for Building Widgets ---
 
     def _build_permission_grid(self, parent_frame, widget_data):
-        # (Unchanged)
         self.permission_vars = {
             'user': {'r': tk.BooleanVar(), 'w': tk.BooleanVar(), 'x': tk.BooleanVar()},
             'group': {'r': tk.BooleanVar(), 'w': tk.BooleanVar(), 'x': tk.BooleanVar()},
@@ -880,7 +1099,6 @@ class CommandBuilderApp:
                 chk.pack(anchor="w", padx=10)
 
     def _build_widget_checkbox(self, parent_frame, widget_data):
-        # (Unchanged)
         var = tk.BooleanVar()
         chk = ttk.Checkbutton(parent_frame, text=widget_data["label"], variable=var, command=self._on_form_change)
         chk.pack(anchor="w")
@@ -888,7 +1106,6 @@ class CommandBuilderApp:
         self.widget_vars.append(widget_data)
 
     def _build_widget_dropdown(self, parent_frame, widget_data):
-        # (Unchanged)
         label = ttk.Label(parent_frame, text=f"{widget_data['label']}:")
         label.pack(side=tk.LEFT, anchor="w")
         var = tk.StringVar()
@@ -899,7 +1116,6 @@ class CommandBuilderApp:
         self.widget_vars.append(widget_data)
 
     def _build_widget_size_input(self, parent_frame, widget_data):
-        # (Unchanged)
         label = ttk.Label(parent_frame, text=f"{widget_data['label']}:")
         label.pack(side=tk.LEFT, anchor="w")
         size_frame = ttk.Frame(parent_frame)
@@ -922,7 +1138,6 @@ class CommandBuilderApp:
         self.widget_vars.append(widget_data)
 
     def _build_widget_relative_time_input(self, parent_frame, widget_data):
-        # (Unchanged)
         label = ttk.Label(parent_frame, text=f"{widget_data['label']}:")
         label.pack(side=tk.LEFT, anchor="w")
         time_frame = ttk.Frame(parent_frame)
@@ -939,7 +1154,6 @@ class CommandBuilderApp:
         self.widget_vars.append(widget_data)
 
     def _build_widget_notable_text_input(self, parent_frame, widget_data):
-        # (Unchanged)
         label = ttk.Label(parent_frame, text=f"{widget_data['label']}:")
         label.pack(side=tk.LEFT, anchor="w")
         not_frame = ttk.Frame(parent_frame)
@@ -956,7 +1170,6 @@ class CommandBuilderApp:
         self.widget_vars.append(widget_data)
 
     def _build_widget_permission_input(self, parent_frame, widget_data):
-        # (Unchanged)
         label = ttk.Label(parent_frame, text=f"{widget_data['label']}:")
         label.pack(side=tk.LEFT, anchor="w")
         perm_frame = ttk.Frame(parent_frame)
@@ -975,7 +1188,6 @@ class CommandBuilderApp:
         self.widget_vars.append(widget_data)
 
     def _build_widget_date_input(self, parent_frame, widget_data):
-        # (Unchanged)
         label = ttk.Label(parent_frame, text=f"{widget_data['label']}:")
         label.pack(side=tk.LEFT, anchor="w")
         date_frame = ttk.Frame(parent_frame)
@@ -985,7 +1197,12 @@ class CommandBuilderApp:
         not_combo.pack(side=tk.LEFT)
         year_var = tk.StringVar()
         current_year = datetime.date.today().year
-        year_list = [""] + list(range(current_year, current_year - 50, -1))
+        
+        # Configurable range (default past 50 years + next 5)
+        min_year = widget_data.get("min_year", current_year - 50)
+        max_year = widget_data.get("max_year", current_year + 5)
+        
+        year_list = [""] + list(range(max_year, min_year - 1, -1))
         year_combo = ttk.Combobox(date_frame, textvariable=year_var, values=year_list, state="readonly", width=6)
         year_combo.pack(side=tk.LEFT, padx=(5, 0))
         month_var = tk.StringVar()
@@ -1010,9 +1227,28 @@ class CommandBuilderApp:
             "day_combo_widget": day_combo
         })
         self.widget_vars.append(widget_data)
+        
+    def _validate_path_chars(self, path):
+        """Check for invalid filesystem characters."""
+        # These are invalid on Windows/Linux/Mac
+        invalid_chars = '<>:"|?*'
+        
+        for char in invalid_chars:
+            if char in path:
+                return False, f"Path contains invalid character: '{char}'"
+        
+        # Check for invalid names on Windows
+        invalid_names = ['CON', 'PRN', 'AUX', 'NUL', 'COM1', 'COM2', 'COM3', 'COM4', 
+                        'COM5', 'COM6', 'COM7', 'COM8', 'COM9', 'LPT1', 'LPT2', 
+                        'LPT3', 'LPT4', 'LPT5', 'LPT6', 'LPT7', 'LPT8', 'LPT9']
+        
+        name_only = Path(path).name.upper().split('.')[0]
+        if name_only in invalid_names:
+            return False, f"'{name_only}' is a reserved system name"
+        
+        return True, ""
 
     def _build_widget_url(self, parent_frame, widget_data):
-        # (Unchanged)
         label = ttk.Label(parent_frame, text=f"{widget_data['label']}:")
         label.pack(side=tk.LEFT, anchor="w")
         url_frame = ttk.Frame(parent_frame)
@@ -1029,7 +1265,6 @@ class CommandBuilderApp:
         self.widget_vars.append(widget_data)
 
     def _build_widget_file_w_ext(self, parent_frame, widget_data):
-        # (Unchanged)
         label = ttk.Label(parent_frame, text=f"{widget_data['label']}:")
         label.pack(side=tk.LEFT, anchor="w")
         file_frame = ttk.Frame(parent_frame)
@@ -1048,19 +1283,52 @@ class CommandBuilderApp:
         widget_data.update({"base_var": base_var, "ext_var": ext_var, "widget": base_entry})
         self.widget_vars.append(widget_data)
 
+    # edit
     def _build_widget_text(self, parent_frame, widget_data):
-        # (Unchanged)
         label = ttk.Label(parent_frame, text=f"{widget_data['label']}:")
         label.pack(side=tk.LEFT, anchor="w")
+        
         var = tk.StringVar()
-        var.trace_add("write", lambda n, i, m: self._on_form_change())
         entry = ttk.Entry(parent_frame, textvariable=var)
         entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
+        
+        # Add validation feedback label
+        feedback_label = ttk.Label(parent_frame, text="", style="Tooltip.TLabel")
+        
+        # Debounce timer to prevent lag
+        validation_timer = None
+        
+        def validate_on_change(*args):
+            nonlocal validation_timer
+            
+            # Cancel previous timer if user is still typing
+            if validation_timer:
+                self.root.after_cancel(validation_timer)
+            
+            value = var.get()
+            max_len = widget_data.get("max_length", 500)
+            
+            # Instant visual feedback for length check
+            if len(value) > max_len:
+                feedback_label.config(
+                    text=f"⚠️ Too long ({len(value)}/{max_len})", 
+                    foreground=self.ERROR_RED
+                )
+                entry.config(style="Invalid.TEntry")
+            else:
+                feedback_label.config(text="")
+                entry.config(style="TEntry")
+            
+            # Debounce the heavy command update (300ms delay)
+            validation_timer = self.root.after(300, self._on_form_change)
+        
+        var.trace_add("write", validate_on_change)
+        feedback_label.pack(fill=tk.X, padx=(25, 10))
+        
         widget_data.update({"var": var, "widget": entry})
         self.widget_vars.append(widget_data)
 
     def _build_widget_file_picker(self, parent_frame, widget_data):
-        # (Unchanged)
         label = ttk.Label(parent_frame, text=f"{widget_data['label']}:")
         label.pack(side=tk.LEFT, anchor="w")
         var = tk.StringVar()
@@ -1069,13 +1337,15 @@ class CommandBuilderApp:
         picker_frame.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
         entry = ttk.Entry(picker_frame, textvariable=var)
         entry.pack(side=tk.LEFT, fill=tk.X, expand=True)
-        button = ttk.Button(picker_frame, text="Browse...", command=lambda: var.set(filedialog.askopenfilename() or var.get()))
+        
+        button = ttk.Button(picker_frame, text="Browse...", 
+                       command=lambda: self._set_path(var, filedialog.askopenfilename()))
+        
         button.pack(side=tk.LEFT, padx=(5, 0))
         widget_data.update({"var": var, "widget": entry})
         self.widget_vars.append(widget_data)
 
     def _build_widget_dir_picker(self, parent_frame, widget_data):
-        # (Unchanged)
         label = ttk.Label(parent_frame, text=f"{widget_data['label']}:")
         label.pack(side=tk.LEFT, anchor="w")
         var = tk.StringVar()
@@ -1084,13 +1354,15 @@ class CommandBuilderApp:
         picker_frame.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
         entry = ttk.Entry(picker_frame, textvariable=var)
         entry.pack(side=tk.LEFT, fill=tk.X, expand=True)
-        button = ttk.Button(picker_frame, text="Browse...", command=lambda: var.set(filedialog.askdirectory() or var.get()))
+        
+        button = ttk.Button(picker_frame, text="Browse...", 
+                       command=lambda: self._set_path(var, filedialog.askdirectory()))
+        
         button.pack(side=tk.LEFT, padx=(5, 0))
         widget_data.update({"var": var, "widget": entry})
         self.widget_vars.append(widget_data)
 
     def _build_widget_file_save_as(self, parent_frame, widget_data):
-        # (Unchanged)
         label = ttk.Label(parent_frame, text=f"{widget_data['label']}:")
         label.pack(side=tk.LEFT, anchor="w")
         var = tk.StringVar()
@@ -1099,18 +1371,37 @@ class CommandBuilderApp:
         picker_frame.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
         entry = ttk.Entry(picker_frame, textvariable=var)
         entry.pack(side=tk.LEFT, fill=tk.X, expand=True)
-        button = ttk.Button(picker_frame, text="Save As...", command=lambda: var.set(filedialog.asksaveasfilename() or var.get()))
+        
+        button = ttk.Button(picker_frame, text="Save As...", 
+                       command=lambda: self._set_path(var, filedialog.asksaveasfilename()))
+        
         button.pack(side=tk.LEFT, padx=(5, 0))
         widget_data.update({"var": var, "widget": entry})
         self.widget_vars.append(widget_data)
 
     def _build_widget_number_input(self, parent_frame, widget_data):
-        # (Unchanged)
         label = ttk.Label(parent_frame, text=f"{widget_data['label']}:")
         label.pack(side=tk.LEFT, anchor="w")
         var = tk.StringVar()
         var.trace_add("write", lambda n, i, m: self._on_form_change())
-        vcmd = (self.root.register(self._validate_numeric_input), '%P')
+        
+        # Get bounds from widget_data
+        min_val = widget_data.get("min", 0)
+        max_val = widget_data.get("max", 999999)
+        
+        # Enhanced validation with bounds
+        def validate_bounded_number(P):
+            if P == "":
+                return True
+            if not P.isdigit():
+                return False
+            try:
+                num = int(P)
+                return min_val <= num <= max_val
+            except ValueError:
+                return False
+        
+        vcmd = (self.root.register(validate_bounded_number), '%P')
         entry = ttk.Entry(parent_frame, textvariable=var, validate="key", validatecommand=vcmd)
         entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
         widget_data.update({"var": var, "widget": entry})
@@ -1162,8 +1453,8 @@ class CommandBuilderApp:
             item["var"].set("")
 
     # --- Helper Methods for Getting Command Arguments ---
-    
     def _get_arg_from_checkbox(self, item, command_name):
+        """Checkbox arguments (flags only, no user input)"""
         if not item["var"].get():
             return None
         
@@ -1171,64 +1462,83 @@ class CommandBuilderApp:
         if flag == "redirect_stderr":
             return {"arg": " 2>/dev/null", "flag": flag, "is_stderr_redirect": True}
         
+        # Flags are predefined, not user input, so safe
         return {"arg": flag, "flag": flag}
 
     def _get_arg_from_size_input(self, item, command_name):
-        op = item["op_var"].get()
+        """Size input: operator + number + unit"""
+        op = item["op_var"].get()  # Dropdown: "", "+", "-" (safe)
         num = item["num_var"].get().strip()
-        unit = item["unit_var"].get()
+        unit = item["unit_var"].get()  # Dropdown: "c", "k", "M", "G" (safe)
         
         if num and unit:
-            size_arg = f"{op}{num}{unit}"
+            # SANITIZE: User can type arbitrary numbers
+            num_safe = self._sanitize_for_shell(num)
+            size_arg = f"{op}{num_safe}{unit}"
+            
             flag = item.get("flag", "")
             if flag:
                 return {"arg": f"{flag} {size_arg}", "flag": flag}
         return None
 
     def _get_arg_from_relative_time_input(self, item, command_name):
-        op = item["op_var"].get()
+        """Relative time: operator + number"""
+        op = item["op_var"].get()  # Dropdown: "", "+", "-" (safe)
         num = item["num_var"].get().strip()
         
         if num:
-            time_arg = f"{op}{num}"
+            # SANITIZE: User can type arbitrary numbers
+            num_safe = self._sanitize_for_shell(num)
+            time_arg = f"{op}{num_safe}"
+            
             flag = item.get("flag", "")
             if flag:
                 return {"arg": f"{flag} {time_arg}", "flag": flag}
         return None
 
     def _get_arg_from_notable_text_input(self, item, command_name):
-        not_op = item["not_var"].get()
+        """Notable text: optional NOT operator + user text"""
+        not_op = item["not_var"].get()  # Dropdown: "", "!" (safe)
         value = item["var"].get().strip()
         
         if value:
-            clean_value = f"'{value}'" if item.get("auto_quote") else value
+            # SANITIZE: User input - CRITICAL
+            value_safe = self._sanitize_for_shell(value)
+            
             flag = item.get("flag", "")
-            full_arg = f"{flag} {clean_value}"
+            full_arg = f"{flag} {value_safe}"
             if not_op:
                 full_arg = f"{not_op} {full_arg}"
             return {"arg": full_arg, "flag": flag}
         return None
 
     def _get_arg_from_permission_input(self, item, command_name):
-        mode_str = item["mode_var"].get().split(" ")[0]
+        """Permission input: mode + permission string"""
+        mode_str = item["mode_var"].get().split(" ")[0]  # " ", "-", "/" (safe)
         value = item["var"].get().strip()
         
         if value:
-            perm_arg = f"{mode_str}{value}"
+            # SANITIZE: User can type arbitrary permission strings
+            value_safe = self._sanitize_for_shell(value)
+            perm_arg = f"{mode_str}{value_safe}"
+            
             flag = item.get("flag", "")
             if flag:
                 return {"arg": f"{flag} {perm_arg}", "flag": flag}
         return None
 
     def _get_arg_from_date_input(self, item, command_name):
-        not_op = item["not_var"].get()
-        year = item["year_var"].get()
-        month_str = item["month_var"].get()
-        day = item["day_var"].get()
+        """Date input: year-month-day with optional NOT"""
+        not_op = item["not_var"].get()  # Dropdown: "", "!" (safe)
+        year = item["year_var"].get()  # Dropdown (safe)
+        month_str = item["month_var"].get()  # Dropdown (safe)
+        day = item["day_var"].get()  # Dropdown (safe)
 
         if year and month_str and day:
             month = month_str.split("-")[0]
-            date_string = f"'{year}-{month}-{day}'" # Always quote dates
+            
+            # Dates from dropdowns are safe, but sanitize anyway (defense in depth)
+            date_string = self._sanitize_for_shell(f"{year}-{month}-{day}")
             
             flag = item.get("flag", "")
             full_arg = f"{flag} {date_string}"
@@ -1237,21 +1547,53 @@ class CommandBuilderApp:
             return {"arg": full_arg, "flag": flag}
         return None
 
+    # --- URL Validation Method ---
+    def _validate_url(self, url):
+        """Validate URL format."""
+        if not url.strip():
+            return True, ""  # Empty is ok (optional field)
+        
+        # Basic pattern: protocol://domain.tld/path
+        pattern = r'^https?://[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?)*'
+        
+        if not re.match(pattern, url):
+            return False, "Invalid URL format. Must start with http:// or https://"
+        
+        return True, ""
+    
+    # --- URL and File with Extension Argument Getters ---
     def _get_arg_from_url(self, item, command_name):
+        """URL input: protocol + user URL"""
         protocol = item["protocol_var"].get()
         url_part = item["url_var"].get().strip()
         
         if url_part:
-            full_url = url_part if url_part.startswith(("http://", "https://")) else f"{protocol}{url_part}"
-            return {"arg": full_url, "flag": None} # URL is always positional
+            # Build full URL
+            if url_part.startswith(("http://", "https://")):
+                full_url = url_part
+            else:
+                full_url = f"{protocol}{url_part}"
+            
+            # Validate before sanitizing
+            is_valid, error = self._validate_url(full_url)
+            if not is_valid:
+                self._show_styled_message("Invalid URL", error, is_warning=True)
+                return None
+            
+            return {"arg": self._sanitize_for_shell(full_url), "flag": None}
         return None
 
     def _get_arg_from_file_w_ext(self, item, command_name):
+        """File with extension: basename + extension"""
         base = item["base_var"].get().strip()
-        ext = item["ext_var"].get().strip()
+        ext = item["ext_var"].get().strip()  # Dropdown (safe)
         
         if base:
-            full_filename = f"{base}{ext}"
+            # SANITIZE: User input filename - CRITICAL
+            base_safe = self._sanitize_for_shell(base)
+            # Extension is from dropdown (safe), but include it inside the quote
+            full_filename = self._sanitize_for_shell(f"{base}{ext}")
+            
             flag = item.get("flag", "")
             if flag:
                 return {"arg": f"{flag} {full_filename}", "flag": flag}
@@ -1260,6 +1602,7 @@ class CommandBuilderApp:
         return None
 
     def _get_arg_from_text(self, item, command_name):
+        """Generic text/dropdown input"""
         if "var" not in item:
             return None
             
@@ -1267,30 +1610,36 @@ class CommandBuilderApp:
         if not value:
             return None
 
-        clean_value = value
-        if item.get("type") == "dropdown" and "(" in clean_value:
-            clean_value = clean_value.split(" ")[0]
+        # For dropdowns, extract just the value before parentheses
+        if item.get("type") == "dropdown" and "(" in value:
+            value = value.split(" ")[0]
         
-        if item.get("auto_quote"):
-            clean_value = f"'{clean_value}'"
-            
+        # SANITIZE: User input - CRITICAL
+        # ALWAYS sanitize, regardless of auto_quote setting
+        clean_value = self._sanitize_for_shell(value)
+        
         flag = item.get("flag", "")
         
         if flag:
             if item.get("prefix_flag"):
+                # For flags that attach directly: -oValue
+                # We need to be careful here - sanitize but keep format
                 return {"arg": f"{flag}{clean_value}", "flag": flag}
             else:
+                # Standard: -flag value
                 return {"arg": f"{flag} {clean_value}", "flag": flag}
         else:
+            # Positional argument
             return {"arg": clean_value, "flag": None}
 
 if __name__ == "__main__":
-    # --- TELL WINDOWS THIS IS A UNIQUE APP ---
-    try:
-        import ctypes
-        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("lcommander.app.1.0")
-    except Exception:
-        pass # mild fail-safe for non-windows systems
+    import platform
+    if platform.system() == "Windows":
+        try:
+            import ctypes
+            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("lcommander.app.1.0")
+        except Exception:
+            pass  # Fail silently if there's any issue
     # ----------------------------------------------
 
     root = tk.Tk()
