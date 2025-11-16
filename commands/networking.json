@@ -21,20 +21,25 @@
         {
           "label": "Headers",
           "flag": "-H",
+          "type": "text",
           "tooltip": "e.g., Content-Type: application/json",
-          "auto_quote": true
+          "auto_quote": true,
+          "max_length": 1000
         },
         {
           "label": "Data",
           "flag": "-d",
+          "type": "text",
           "tooltip": "e.g., key=value or {\"key\":\"value\"}",
-          "auto_quote": true
+          "auto_quote": true,
+          "max_length": 1000
         },
         {
           "label": "Output to file",
           "flag": "-o",
           "type": "file_save_as",
-          "tooltip": "Save response to file instead of stdout (e.g., page.html)."
+          "tooltip": "Save response to file instead of stdout (e.g., page.html).",
+          "max_length": 4096
         },
         {
           "label": "Follow redirects (-L)",
@@ -57,7 +62,9 @@
           "label": "URL",
           "flag": "",
           "type": "url",
-          "tooltip": "The target URL (e.g., https://example.com)."
+          "tooltip": "The target URL (e.g., https://example.com).",
+          "max_length": 2048,
+          "validate_format": true
         }
       ]
     },
@@ -85,8 +92,10 @@
         {
           "label": "DNS Server",
           "flag": "@",
+          "type": "text",
           "tooltip": "e.g., 8.8.8.8 to use Google DNS.",
-          "prefix_flag": true
+          "prefix_flag": true,
+          "max_length": 255
         },
         {
           "label": "Short output (+short)",
@@ -96,7 +105,9 @@
         {
           "label": "Domain Name",
           "flag": "",
-          "tooltip": "The domain name to query, e.g., google.com"
+          "type": "text",
+          "tooltip": "The domain name to query, e.g., google.com",
+          "max_length": 255
         }
       ]
     },
@@ -108,7 +119,9 @@
         {
           "label": "Interface",
           "flag": "",
-          "tooltip": "Network interface name (e.g., eth0, wlan0). Leave blank to show all."
+          "type": "text",
+          "tooltip": "Network interface name (e.g., eth0, wlan0). Leave blank to show all.",
+          "max_length": 255
         }
       ]
     },
@@ -132,7 +145,9 @@
         {
           "label": "Additional arguments",
           "flag": "",
-          "tooltip": "e.g., eth0, or 192.168.1.10/24 dev eth0"
+          "type": "text",
+          "tooltip": "e.g., eth0, or 192.168.1.10/24 dev eth0",
+          "max_length": 1000
         }
       ]
     },
@@ -201,7 +216,9 @@
         {
           "label": "Ports",
           "flag": "-p",
-          "tooltip": "e.g., 80,443 or 1-1024. Leave blank for default scan."
+          "type": "text",
+          "tooltip": "e.g., 80,443 or 1-1024. Leave blank for default scan.",
+          "max_length": 1000
         },
         {
           "label": "Aggressive Scan (-A)",
@@ -224,12 +241,15 @@
           "label": "Output to file",
           "flag": "-oN",
           "type": "file_save_as",
-          "tooltip": "Saves output in normal format to the specified file."
+          "tooltip": "Saves output in normal format to the specified file.",
+          "max_length": 4096
         },
         {
           "label": "Target",
           "flag": "",
-          "tooltip": "IP, hostname, or network range (e.g., 192.168.1.1/24)."
+          "type": "text",
+          "tooltip": "IP, hostname, or network range (e.g., 192.168.1.1/24).",
+          "max_length": 1000
         }
       ]
     },
@@ -241,23 +261,31 @@
           "label": "Count",
           "flag": "-c",
           "type": "number_input",
-          "tooltip": "Stop after sending this many packets (e.g., 4)."
+          "tooltip": "Stop after sending this many packets (e.g., 4).",
+          "min": 1,
+          "max": 99999
         },
         {
           "label": "Interval (seconds)",
           "flag": "-i",
-          "tooltip": "Wait interval seconds between packets (e.g., 0.5). Default is 1."
+          "type": "text",
+          "tooltip": "Wait interval seconds between packets (e.g., 0.5). Default is 1.",
+          "max_length": 10
         },
         {
           "label": "Packet size",
           "flag": "-s",
           "type": "number_input",
-          "tooltip": "Packet size in bytes (e.g., 1024). Default is 56."
+          "tooltip": "Packet size in bytes (e.g., 1024). Default is 56.",
+          "min": 0,
+          "max": 65507
         },
         {
           "label": "Hostname or IP Address",
           "flag": "",
-          "tooltip": "e.g., google.com or 8.8.8.8"
+          "type": "text",
+          "tooltip": "e.g., google.com or 8.8.8.8",
+          "max_length": 255
         }
       ]
     },
@@ -303,13 +331,15 @@
           "label": "Source",
           "flag": "",
           "type": "text",
-          "tooltip": "Source file/directory. Can be remote user@host:/path"
+          "tooltip": "Source file/directory. Can be remote user@host:/path",
+          "max_length": 4096
         },
         {
           "label": "Destination",
           "flag": "",
           "type": "text",
-          "tooltip": "Destination path. Can be remote user@host:/path"
+          "tooltip": "Destination path. Can be remote user@host:/path",
+          "max_length": 4096
         }
       ]
     },
@@ -321,13 +351,16 @@
           "label": "Port",
           "flag": "-P",
           "type": "number_input",
-          "tooltip": "SSH port (note: capital P for scp). e.g., 2222"
+          "tooltip": "SSH port (note: capital P for scp). e.g., 2222",
+          "min": 1,
+          "max": 65535
         },
         {
           "label": "Identity file",
           "flag": "-i",
           "type": "file_picker",
-          "tooltip": "e.g., ~/.ssh/id_rsa"
+          "tooltip": "e.g., ~/.ssh/id_rsa",
+          "max_length": 4096
         },
         {
           "label": "Recursive (-r)",
@@ -344,13 +377,15 @@
           "label": "Source",
           "flag": "",
           "type": "file_picker",
-          "tooltip": "user@host:/path/file or local file."
+          "tooltip": "user@host:/path/file or local file.",
+          "max_length": 4096
         },
         {
           "label": "Destination",
           "flag": "",
           "type": "dir_picker",
-          "tooltip": "user@host:/path/ or local path."
+          "tooltip": "user@host:/path/ or local path.",
+          "max_length": 4096
         }
       ]
     },
@@ -400,13 +435,16 @@
           "label": "Port",
           "flag": "-p",
           "type": "number_input",
-          "tooltip": "SSH port (e.g., 22). Default is 22."
+          "tooltip": "SSH port (e.g., 22). Default is 22.",
+          "min": 1,
+          "max": 65535
         },
         {
           "label": "Identity file (private key)",
           "flag": "-i",
           "type": "file_picker",
-          "tooltip": "e.g., ~/.ssh/id_rsa"
+          "tooltip": "e.g., ~/.ssh/id_rsa",
+          "max_length": 4096
         },
         {
           "label": "Compression (-C)",
@@ -421,13 +459,17 @@
         {
           "label": "User@Hostname",
           "flag": "",
-          "tooltip": "e.g., root@192.168.1.1 or user@example.com"
+          "type": "text",
+          "tooltip": "e.g., root@192.168.1.1 or user@example.com",
+          "max_length": 255
         },
         {
           "label": "Execute command",
           "flag": "",
+          "type": "text",
           "tooltip": "Command to run on remote host (e.g., ls -l).",
-          "auto_quote": true
+          "auto_quote": true,
+          "max_length": 1000
         }
       ]
     },
@@ -439,12 +481,16 @@
           "label": "Max hops",
           "flag": "-m",
           "type": "number_input",
-          "tooltip": "Maximum number of hops (e.g., 15). Default is 30."
+          "tooltip": "Maximum number of hops (e.g., 15). Default is 30.",
+          "min": 1,
+          "max": 255
         },
         {
           "label": "Hostname or IP",
           "flag": "",
-          "tooltip": "Destination to trace route to (e.g., google.com)."
+          "type": "text",
+          "tooltip": "Destination to trace route to (e.g., google.com).",
+          "max_length": 255
         }
       ]
     },
@@ -459,7 +505,8 @@
           "tooltip": "Save as this filename (e.g., file.zip). Conflicts with Recursive.",
           "disables": [
             "-r"
-          ]
+          ],
+          "max_length": 4096
         },
         {
           "label": "Continue download (-c)",
@@ -485,7 +532,9 @@
           "label": "URL",
           "flag": "",
           "type": "url",
-          "tooltip": "URL of the file to download."
+          "tooltip": "URL of the file to download.",
+          "max_length": 2048,
+          "validate_format": true
         }
       ]
     },
@@ -496,7 +545,9 @@
         {
           "label": "Domain or IP",
           "flag": "",
-          "tooltip": "e.g., google.com or 216.58.194.174"
+          "type": "text",
+          "tooltip": "e.g., google.com or 216.58.194.174",
+          "max_length": 255
         }
       ]
     },
@@ -529,26 +580,32 @@
         {
           "label": "Execute Program (-e)",
           "flag": "-e",
+          "type": "text",
           "tooltip": "Execute a program on connect (e.g., /bin/bash). **DANGEROUS**\nOnly use in Listen Mode. Conflicts with 'Host'.",
           "auto_quote": true,
           "disables": [
             "HOST"
-          ]
+          ],
+          "max_length": 4096
         },
         {
           "label": "Host (for Connect)",
           "flag": "HOST",
+          "type": "text",
           "tooltip": "The target host to connect to (e.g., 10.10.10.1).\nConflicts with 'Listen Mode' and 'Execute Program'.",
           "disables": [
             "-l",
             "-e"
-          ]
+          ],
+          "max_length": 255
         },
         {
           "label": "Port (Connect/Listen)",
           "flag": "",
           "type": "number_input",
-          "tooltip": "The target port to connect to OR the port to listen on (e.g., 4444).\nHTB Tip: Use 'sudo' if listening on ports < 1024."
+          "tooltip": "The target port to connect to OR the port to listen on (e.g., 4444).\nHTB Tip: Use 'sudo' if listening on ports < 1024.",
+          "min": 1,
+          "max": 65535
         }
       ]
     },
@@ -561,18 +618,23 @@
           "label": "Port",
           "flag": "",
           "type": "number_input",
-          "tooltip": "Port to serve on (e.g., 8000). Default is 8000.\nUse 'sudo' to bind to privileged ports (e.g., 80)."
+          "tooltip": "Port to serve on (e.g., 8000). Default is 8000.\nUse 'sudo' to bind to privileged ports (e.g., 80).",
+          "min": 1,
+          "max": 65535
         },
         {
           "label": "Bind to IP",
           "flag": "-b",
-          "tooltip": "IP to bind to (e.g., 0.0.0.0 to listen on all interfaces)."
+          "type": "text",
+          "tooltip": "IP to bind to (e.g., 0.0.0.0 to listen on all interfaces).",
+          "max_length": 255
         },
         {
           "label": "Directory",
           "flag": "-d",
           "type": "dir_picker",
-          "tooltip": "Directory to serve. Default is the current directory.\n\nHTB Tip:\nThis is the #1 way to serve exploits or scripts (like linpeas.sh) to a victim machine."
+          "tooltip": "Directory to serve. Default is the current directory.\n\nHTB Tip:\nThis is the #1 way to serve exploits or scripts (like linpeas.sh) to a victim machine.",
+          "max_length": 4096
         }
       ]
     },
@@ -598,21 +660,27 @@
         {
           "label": "Username",
           "flag": "-U",
-          "tooltip": "e.g., administrator"
+          "type": "text",
+          "tooltip": "e.g., administrator",
+          "max_length": 32
         },
         {
           "label": "Host",
           "flag": "",
-          "tooltip": "The target host (e.g., //10.10.10.1)."
+          "type": "text",
+          "tooltip": "The target host (e.g., //10.10.10.1).",
+          "max_length": 255
         },
         {
           "label": "Share Name",
           "flag": "SHARE",
+          "type": "text",
           "tooltip": "The share to connect to (e.g., C$ or IPC$).\nConflicts with 'List Shares'.\n\nHTB Tip:\nAlways start with `smbclient -L //HOST -N` to check for anonymous share access.",
           "auto_quote": true,
           "disables": [
             "-L"
-          ]
+          ],
+          "max_length": 255
         }
       ]
     }
