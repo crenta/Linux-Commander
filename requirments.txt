@@ -1,6 +1,0 @@
-# Required dependencies
-pyperclip>=1.8.0
-Pillow>=10.0.0
-
-# Optional dependencies -- may not be neccesary anymore
-requests>=2.31.0 # Enables auto-download of command files on first run
