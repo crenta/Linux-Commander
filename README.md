@@ -1,7 +1,7 @@
+<p align="center"># 🐧 Linux Command Builder </p>
 # 🐧 Linux Command Builder
 
 <div align="center">
-# 🐧 Linux Command Builder
 
 <p align="center">
   <img src="LOGO.png" alt="Linux Command Builder Logo" width="200" />
@@ -535,4 +535,5 @@ Please report it on our [issue tracker](https://github.com/crenta/Linux-Commande
 
 
 </div>
+
 
