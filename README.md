@@ -307,10 +307,7 @@ linux-commander/
 ├── LOGO.png                   # Application icon
 ├── requirements.txt           # Python dependencies
 ├── README.md                  # This file
-├── LICENSE                    # License
-├── tester.py                  # testing
-├── tester2.py                 # testing
-└── tester3.py                 # testing
+└──  LICENSE                    # License
 ```
 
 ### Adding New Commands
@@ -534,5 +531,6 @@ Please report it on our [issue tracker](https://github.com/crenta/Linux-Commande
 **Made with ❤️ by [Crenta](https://github.com/crenta)**
 
 ⭐ Star us on GitHub — it helps!
+
 
 </div>
