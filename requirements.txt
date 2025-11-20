@@ -4,5 +4,5 @@ Pillow>=10.0.0
 
 # Optional dependencies
 requests>=2.31.0 # Enables auto-download of command files on first run
-
 validators~=0.28.0 # URL validation for command files
+
