@@ -1,6 +1,4 @@
-<p align="center">
-  <h1>🐧 Linux Command Builder</h1>
-</p>
+<p align="center"><h1>🐧 Linux Command Builder</h1></p>
 
 <div align="center">
 
@@ -536,6 +534,7 @@ Please report it on our [issue tracker](https://github.com/crenta/Linux-Commande
 
 
 </div>
+
 
 
 
